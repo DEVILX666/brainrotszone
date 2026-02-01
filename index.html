@@ -865,6 +865,13 @@
       left: 50%;
       transform: translate(-50%, -50%);
       border: 2px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    body.video-modal-open {
+      overflow: hidden !important;
     }
     .popup-header {
       position: relative;
@@ -1461,6 +1468,7 @@
     // Function to close popup
     const closePurchasePopup = () => {
       document.getElementById('purchase-popup').style.display = 'none';
+      document.body.classList.remove('video-modal-open');
       popupOpen = false;
       // إعادة تشغيل الإشعارات عند إغلاق الواجهة
       startNotifications();
@@ -1619,9 +1627,10 @@
       videoStyle.innerHTML = `
         @media (max-width: 768px) {
           .purchase-popup {
-            background: rgba(0, 0, 0, 0.85) !important;
+            background: rgba(0, 0, 0, 0.95) !important;
             backdrop-filter: blur(5px) !important;
             padding: 0 !important;
+            display: flex !important;
           }
           .popup-content {
             width: 100vw !important;
@@ -1634,11 +1643,15 @@
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
             transform: none !important;
-            background: transparent !important;
+            background: rgba(0, 0, 0, 0.95) !important;
             border: none !important;
             box-shadow: none !important;
             overflow: hidden !important;
+            flex-direction: column !important;
+            display: flex !important;
           }
           .video-overlay-container {
             width: 100vw !important;
@@ -1666,9 +1679,11 @@
             width: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
+            border-radius: 0 !important;
           }
           .video-footer {
-            padding: 10px 12px !important;
+            padding: 12px 15px !important;
+            flex-shrink: 0 !important;
           }
           .video-continue-btn {
             font-size: 0.95em !important;
@@ -1733,6 +1748,9 @@
       `;
       document.head.appendChild(videoStyle);
       
+      // Add body overflow class when video modal opens
+      document.body.classList.add('video-modal-open');
+      
       updateButton();
       
       const timer = setInterval(() => {
@@ -1753,6 +1771,8 @@
               clickSound.currentTime = 0;
               clickSound.play();
             }
+            // Remove body overflow class when closing
+            document.body.classList.remove('video-modal-open');
             window.location.href = lockerUrl;
           }
         });
