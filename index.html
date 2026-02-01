@@ -865,13 +865,6 @@
       left: 50%;
       transform: translate(-50%, -50%);
       border: 2px solid rgba(255, 255, 255, 0.2);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    
-    body.video-modal-open {
-      overflow: hidden !important;
     }
     .popup-header {
       position: relative;
@@ -1468,7 +1461,6 @@
     // Function to close popup
     const closePurchasePopup = () => {
       document.getElementById('purchase-popup').style.display = 'none';
-      document.body.classList.remove('video-modal-open');
       popupOpen = false;
       // إعادة تشغيل الإشعارات عند إغلاق الواجهة
       startNotifications();
@@ -1607,17 +1599,17 @@
       
       popupContent.innerHTML = `
         <div class="video-overlay-container" style="background: var(--card-bg); width: 100%; height: 100%; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
-          <div class="video-header" style="flex-shrink: 0; padding: 12px 15px; text-align: center; background: rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
-            <h3 class="video-title" style="color: #white; font-size: 1.2em; font-weight: 700; margin: 0 0 4px 0; letter-spacing: 0; line-height: 1.2; font-family: 'Poppins', Arial, sans-serif;">How To Get Any Brainrot For Free</h3>
-            <p class="video-subtitle" style="color: #e5e7eb; font-size: 0.85em; margin: 0; display: flex; align-items: center; justify-content: center; gap: 4px; line-height: 1.2; font-family: 'Poppins', Arial, sans-serif;">
-              Watch the video till the end <span style="font-size: 1.1em;">👇</span>
+          <div class="video-header" style="flex-shrink: 0; padding: 16px 18px; text-align: center; background: rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+            <h3 class="video-title" style="color: #ffffff; font-size: 1.5em; font-weight: 800; margin: 0 0 6px 0; letter-spacing: -0.5px; line-height: 1.3; font-family: 'Poppins', Arial, sans-serif;">How To Get Any Brainrot For Free</h3>
+            <p class="video-subtitle" style="color: #e5e7eb; font-size: 0.95em; margin: 0; display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.3; font-family: 'Poppins', Arial, sans-serif; font-weight: 500;">
+              Watch the video till the end <span style="font-size: 1.2em;">👇</span>
             </p>
           </div>
-          <div class="video-wrapper" style="flex: 1; min-height: 0; position: relative; width: 100%; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin: 8px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);">
-            <iframe allow="fullscreen" allowfullscreen height="100%" src="https://streamable.com/e/t35rls?loop=0&nocontrols=1" width="100%" style="border: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></iframe>
+          <div class="video-wrapper" style="flex: 1; min-height: 0; position: relative; width: 100%; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; border-radius: 0; margin: 0; box-shadow: none;">
+            <iframe allow="fullscreen" allowfullscreen src="https://streamable.com/e/t35rls?loop=0&nocontrols=1" style="border: none; width: 100%; height: 100%; object-fit: cover;"></iframe>
           </div>
-          <div class="video-footer" style="flex-shrink: 0; padding: 12px 15px; background: rgba(255, 255, 255, 0.05); border-top: 1px solid rgba(255, 255, 255, 0.1);">
-            <button id="video-continue-btn" class="video-continue-btn" style="background: linear-gradient(90deg, #22c55e 0%, #16e085 100%); color: #fff; font-size: 1em; font-weight: 700; border-radius: 10px; border: none; padding: 14px 0; cursor: not-allowed; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); transition: all 0.3s; width: 100%; opacity: 0.6; box-sizing: border-box;">Continue (${formatTime(timeLeft)})</button>
+          <div class="video-footer" style="flex-shrink: 0; padding: 16px 18px; background: rgba(255, 255, 255, 0.05); border-top: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+            <p id="video-timer" style="color: #22c55e; font-size: 1.1em; margin: 0; font-family: 'Poppins', Arial, sans-serif; font-weight: 700; letter-spacing: 0.5px;">Redirecting in ${formatTime(timeLeft)}...</p>
           </div>
         </div>
       `;
@@ -1627,10 +1619,9 @@
       videoStyle.innerHTML = `
         @media (max-width: 768px) {
           .purchase-popup {
-            background: rgba(0, 0, 0, 0.95) !important;
+            background: rgba(0, 0, 0, 0.85) !important;
             backdrop-filter: blur(5px) !important;
             padding: 0 !important;
-            display: flex !important;
           }
           .popup-content {
             width: 100vw !important;
@@ -1643,15 +1634,11 @@
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
             transform: none !important;
-            background: rgba(0, 0, 0, 0.95) !important;
+            background: transparent !important;
             border: none !important;
             box-shadow: none !important;
             overflow: hidden !important;
-            flex-direction: column !important;
-            display: flex !important;
           }
           .video-overlay-container {
             width: 100vw !important;
@@ -1663,14 +1650,14 @@
             background: var(--card-bg) !important;
           }
           .video-header {
-            padding: 10px 12px !important;
+            padding: 14px 14px !important;
           }
           .video-title {
-            font-size: 1.1em !important;
-            margin-bottom: 4px !important;
+            font-size: 1.3em !important;
+            margin-bottom: 6px !important;
           }
           .video-subtitle {
-            font-size: 0.8em !important;
+            font-size: 0.9em !important;
             margin: 0 !important;
           }
           .video-wrapper {
@@ -1679,11 +1666,9 @@
             width: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
-            border-radius: 0 !important;
           }
           .video-footer {
-            padding: 12px 15px !important;
-            flex-shrink: 0 !important;
+            padding: 10px 12px !important;
           }
           .video-continue-btn {
             font-size: 0.95em !important;
@@ -1692,16 +1677,16 @@
         }
         @media (max-width: 600px) {
           .video-header {
-            padding: 8px 10px !important;
+            padding: 12px 12px !important;
           }
           .video-title {
-            font-size: 1em !important;
+            font-size: 1.15em !important;
           }
           .video-subtitle {
-            font-size: 0.75em !important;
+            font-size: 0.85em !important;
           }
           .video-footer {
-            padding: 8px 10px !important;
+            padding: 12px 12px !important;
           }
           .video-continue-btn {
             font-size: 0.9em !important;
@@ -1748,35 +1733,32 @@
       `;
       document.head.appendChild(videoStyle);
       
-      // Add body overflow class when video modal opens
-      document.body.classList.add('video-modal-open');
+      const updateTimer = () => {
+        const timerDisplay = document.getElementById('video-timer');
+        if (timerDisplay) {
+          timerDisplay.textContent = `Redirecting in ${formatTime(timeLeft)}...`;
+        }
+      };
       
-      updateButton();
+      updateTimer();
       
       const timer = setInterval(() => {
         timeLeft--;
-        updateButton();
+        updateTimer();
         
         if (timeLeft <= 0) {
           clearInterval(timer);
+          // Automatically redirect to locker when timer ends
+          const clickSound = document.getElementById('clickSound');
+          if (clickSound) {
+            clickSound.currentTime = 0;
+            clickSound.play();
+          }
+          setTimeout(() => {
+            window.location.href = lockerUrl;
+          }, 500);
         }
       }, 1000);
-      
-      const continueBtn = document.getElementById('video-continue-btn');
-      if (continueBtn) {
-        continueBtn.addEventListener('click', function() {
-          if (timeLeft <= 0 && !this.disabled) {
-            const clickSound = document.getElementById('clickSound');
-            if (clickSound) {
-              clickSound.currentTime = 0;
-              clickSound.play();
-            }
-            // Remove body overflow class when closing
-            document.body.classList.remove('video-modal-open');
-            window.location.href = lockerUrl;
-          }
-        });
-      }
     };
 
     // Function to show verification state
