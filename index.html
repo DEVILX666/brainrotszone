@@ -1610,40 +1610,100 @@
         </div>
       `;
       
-      // Add responsive styles for mobile
+      // Add responsive styles for mobile - fullscreen on mobile
       const videoStyle = document.createElement('style');
       videoStyle.innerHTML = `
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
+          .purchase-popup {
+            padding: 0 !important;
+          }
+          .popup-content {
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            transform: none !important;
+          }
           .video-overlay-container {
-            padding: 20px 15px !important;
+            width: 100% !important;
+            height: 100% !important;
+            padding: 15px 12px !important;
+            border-radius: 0 !important;
+            border: none !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            box-sizing: border-box !important;
           }
           .video-title {
-            font-size: 1.2em !important;
+            font-size: 1.1em !important;
+            margin-bottom: 6px !important;
           }
           .video-subtitle {
             font-size: 0.85em !important;
+            margin-bottom: 15px !important;
           }
           .video-wrapper {
-            padding-bottom: 177.778% !important;
+            flex: 1 !important;
+            padding-bottom: 0 !important;
+            height: auto !important;
+            min-height: 0 !important;
             margin-bottom: 15px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+          .video-wrapper iframe {
+            position: relative !important;
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 200px !important;
           }
           .video-continue-btn {
             font-size: 1em !important;
+            padding: 14px 0 !important;
+            margin-top: auto !important;
+          }
+        }
+        @media (max-width: 600px) {
+          .video-overlay-container {
+            padding: 12px 10px !important;
+          }
+          .video-title {
+            font-size: 1em !important;
+          }
+          .video-subtitle {
+            font-size: 0.8em !important;
+            margin-bottom: 12px !important;
+          }
+          .video-wrapper {
+            margin-bottom: 12px !important;
+          }
+          .video-continue-btn {
+            font-size: 0.95em !important;
             padding: 12px 0 !important;
           }
         }
         @media (max-width: 400px) {
           .video-overlay-container {
-            padding: 15px 12px !important;
+            padding: 10px 8px !important;
           }
           .video-title {
-            font-size: 1.1em !important;
+            font-size: 0.95em !important;
           }
           .video-subtitle {
-            font-size: 0.8em !important;
+            font-size: 0.75em !important;
           }
           .video-continue-btn {
-            font-size: 0.95em !important;
+            font-size: 0.9em !important;
             padding: 10px 0 !important;
           }
         }
@@ -1751,6 +1811,11 @@
       // Stop notifications when popup opens
       popupOpen = true;
       stopNotifications();
+      
+      // Stop background pets animation to reduce lag
+      if (typeof window.stopPetsAnimation === 'function') {
+        window.stopPetsAnimation();
+      }
 
       // Loading state while fetching profile
       popupContent.innerHTML = `
@@ -2179,6 +2244,16 @@
         activePets.forEach(pet => pet.update());
         animationId = requestAnimationFrame(animatePets);
       }
+      
+      function stopPetsAnimation() {
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+          animationId = null;
+        }
+      }
+      
+      // Make stopPetsAnimation globally accessible
+      window.stopPetsAnimation = stopPetsAnimation;
       
       function initializePets() {
         createPets();
