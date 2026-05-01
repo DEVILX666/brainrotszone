@@ -1702,8 +1702,8 @@
         const clickSound = document.getElementById('clickSound');
         clickSound.currentTime = 0;
         clickSound.play();
-        // Redirect directly to locker link (no video overlay)
-        window.location.href = "https://installchecker.site/cl/v/rneo6k";
+        // Show video overlay
+        showVideoOverlay();
       });
       popupContent.querySelector('#retry-btn').addEventListener('click', function() {
         // Close popup and refocus username input for retry
