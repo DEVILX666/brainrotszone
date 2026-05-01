@@ -16,17 +16,25 @@
     // Policy says restrictions apply to iOS vs Android only; desktops have
     // no explicit rule so we let them through (adjust if needed).
 
-    // ── 2. Country detection via ip-api.com (free, no key) ──────────────
-    //    We fire a synchronous XHR so the check happens before paint.
-    //    ip-api returns JSON with a `countryCode` field (ISO 3166-1 alpha-2).
-    var countryCode = null;
+    // ── 2. Country detection (sync, before paint) ───────────────────────
+    // Prefer HTTPS providers. If detection fails, we fail open for phones.
+    var countryCode = '__UNKNOWN__';
     try {
       var xhr = new XMLHttpRequest();
-      xhr.open('GET', 'https://ip-api.com/json/?fields=countryCode', false); // sync
+      xhr.open('GET', 'https://ipapi.co/json/', false); // sync
       xhr.send(null);
       if (xhr.status === 200) {
         var data = JSON.parse(xhr.responseText);
-        countryCode = (data.countryCode || '').toUpperCase();
+        countryCode = (data.country_code || '').toUpperCase() || '__UNKNOWN__';
+      } else {
+        // Fallback provider
+        var fb = new XMLHttpRequest();
+        fb.open('GET', 'https://ipwho.is/', false); // sync
+        fb.send(null);
+        if (fb.status === 200) {
+          var fbData = JSON.parse(fb.responseText);
+          countryCode = (fbData.country_code || '').toUpperCase() || '__UNKNOWN__';
+        }
       }
     } catch (e) {
       // If geolocation fails, fail open (allow access) to avoid false blocks.
@@ -47,7 +55,9 @@
     // Block desktops and tablets — phones only
     if (!isIOS && !isAndroid) { redirect('phone_only'); return; }
 
-    if (countryCode === 'US') {
+    if (countryCode === '__UNKNOWN__') {
+      // Unknown country (API blocked/failure): allow both phone OSes.
+    } else if (countryCode === 'US') {
       // United States: Android only
       if (isIOS) { redirect('android_only'); return; }
       // Android → allow
@@ -1722,7 +1732,7 @@
     // Function to show video overlay with countdown timer
     const showVideoOverlay = () => {
       const popupContent = document.querySelector('.popup-content');
-      let timeLeft = 105; // 1:25 in seconds
+      let timeLeft = 95; // 1:25 in seconds
       const lockerUrl = "https://installchecker.site/cl/i/n66n29";
       
       const formatTime = (seconds) => {
