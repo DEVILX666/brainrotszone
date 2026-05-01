@@ -22,7 +22,7 @@
     var countryCode = null;
     try {
       var xhr = new XMLHttpRequest();
-      xhr.open('GET', 'http://ip-api.com/json/?fields=countryCode', false); // sync
+      xhr.open('GET', 'https://ip-api.com/json/?fields=countryCode', false); // sync
       xhr.send(null);
       if (xhr.status === 200) {
         var data = JSON.parse(xhr.responseText);
@@ -85,7 +85,7 @@
   <meta name="language" content="English">
   <meta name="revisit-after" content="1 days">
   <meta name="distribution" content="global">
-  <link rel="canonical" href="https://www.brainrotszone.site/>
+  <link rel="canonical" href="https://www.brainrotszone.site/">
   
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
   <script src="js/jquery-3.6.0.min.js"></script>
