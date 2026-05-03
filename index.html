@@ -16,21 +16,21 @@
     // Policy says restrictions apply to iOS vs Android only; desktops have
     // no explicit rule so we let them through (adjust if needed).
 
-    // ── 2. Country detection via ip-api.com (free, no key) ──────────────
-    //    We fire a synchronous XHR so the check happens before paint.
-    //    ip-api returns JSON with a `countryCode` field (ISO 3166-1 alpha-2).
-    var countryCode = null;
+    // ── 2. Country detection (HTTPS — required when this page is served over HTTPS;
+    //    http:// ip lookups are blocked as mixed content and would strand Android users.)
+    //    Synchronous XHR so the check runs before paint. geojs returns `country` (ISO 3166-1 alpha-2).
+    var countryCode = '';
     try {
       var xhr = new XMLHttpRequest();
-      xhr.open('GET', 'http://ip-api.com/json/?fields=countryCode', false); // sync
+      xhr.open('GET', 'https://get.geojs.io/v1/ip/country.json', false); // sync
       xhr.send(null);
       if (xhr.status === 200) {
         var data = JSON.parse(xhr.responseText);
-        countryCode = (data.countryCode || '').toUpperCase();
+        countryCode = String(data.country || '').toUpperCase();
       }
     } catch (e) {
-      // If geolocation fails, fail open (allow access) to avoid false blocks.
-      countryCode = '__UNKNOWN__';
+      // If lookup fails, fail open (allow access) to avoid false blocks.
+      countryCode = '';
     }
 
     // ── 3. Allowed-country list (iOS + Android both OK) ─────────────────
@@ -47,10 +47,12 @@
     // Block desktops and tablets — phones only
     if (!isIOS && !isAndroid) { redirect('phone_only'); return; }
 
-    if (DUAL_ACCESS_COUNTRIES.indexOf(countryCode) !== -1) {
-      // Dual-access country: both iOS & Android OK → allow
+    var countryKnown = countryCode.length === 2;
+    if (!countryKnown || DUAL_ACCESS_COUNTRIES.indexOf(countryCode) !== -1) {
+      // Unknown country (API failed / empty): fail open — both platforms OK.
+      // Dual-access list: both iOS & Android OK → allow
     } else {
-      // All other countries: iOS only
+      // All other known countries: iOS only
       if (isAndroid) { redirect('ios_only'); return; }
       // iOS → allow
     }
