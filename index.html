@@ -1396,154 +1396,159 @@
     // Fetches avatars for all usernames in the background, staggered to avoid
     // overloading the proxy. Results are cached in sessionStorage for the tab.
 
-    const FALLBACK_AVATAR = 'https://www.roblox.com/headshot-thumbnail/image?userId=1&width=150&height=150&format=png';
-    const AVATAR_PROXIES = [
-      'https://oathnet.org/api/service/roblox/userinfo/',
-      'https://api.newstargeted.com/roblox/userinfo/'
-    ];
-    const AVATAR_CACHE_KEY = 'roblox_avatar_cache_v2';
-    const STAGGER_MS = 300; // delay between each request to be proxy-friendly
-    const MAX_AVATAR_RETRIES = 2;
+   // ── Avatar System v2 (multi-strategy, batched) ─────────────────────────────
+const FALLBACK_AVATAR = 'https://www.roblox.com/headshot-thumbnail/image?userId=1&width=150&height=150&format=png';
+const AVATAR_CACHE_KEY = 'rbx_av_v3';
+const avatarCache = {};
 
-    // username (lowercase) → avatar URL
-    const avatarCache = {};
+/* 1. Seed from sessionStorage */
+try {
+  const s = JSON.parse(sessionStorage.getItem(AVATAR_CACHE_KEY) || '{}');
+  Object.assign(avatarCache, s);
+} catch(_) {}
 
-    function isUsableAvatarUrl(url) {
-      return typeof url === 'string' &&
-        /^https?:\/\//i.test(url) &&
-        !url.includes('userId=1&width=150');
+function saveCache() {
+  try { sessionStorage.setItem(AVATAR_CACHE_KEY, JSON.stringify(avatarCache)); } catch(_) {}
+}
+
+/* 2. Verify an image URL actually loads */
+function verifyImg(url, ms = 5000) {
+  return new Promise(res => {
+    const img = new Image();
+    const t = setTimeout(() => res(false), ms);
+    img.onload  = () => { clearTimeout(t); res(true);  };
+    img.onerror = () => { clearTimeout(t); res(false); };
+    img.src = url;
+  });
+}
+
+/* 3. Strategy A – Roblox users endpoint (username → userId) */
+async function strategyRobloxDirect(username) {
+  const r = await fetch(
+    `https://users.roblox.com/v1/usernames/users`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usernames: [username], excludeBannedUsers: false })
     }
+  );
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const d = await r.json();
+  const id = d?.data?.[0]?.id;
+  if (!id) throw new Error('no id');
+  return `https://www.roblox.com/headshot-thumbnail/image?userId=${id}&width=150&height=150&format=png`;
+}
 
-    function extractAvatarUrl(payload) {
-      if (!payload || typeof payload !== 'object') return null;
-      if (isUsableAvatarUrl(payload.avatar)) return payload.avatar;
-      if (isUsableAvatarUrl(payload.avatarUrl)) return payload.avatarUrl;
-      if (payload.data && typeof payload.data === 'object') {
-        if (isUsableAvatarUrl(payload.data.avatar)) return payload.data.avatar;
-        if (isUsableAvatarUrl(payload.data.avatarUrl)) return payload.data.avatarUrl;
-      }
-      return null;
-    }
+/* 4. Strategy B – thumbnails batch endpoint (by userId) */
+async function strategyThumbnailBatch(userIds) {
+  const ids = userIds.join(',');
+  const r = await fetch(
+    `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${ids}&size=150x150&format=Png&isCircular=false`
+  );
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const d = await r.json();
+  const map = {};
+  (d.data || []).forEach(item => {
+    if (item.imageUrl) map[item.targetId] = item.imageUrl;
+  });
+  return map;
+}
 
-    function extractUserId(payload) {
-      if (!payload || typeof payload !== 'object') return null;
-      const directId = payload.userId || payload.userid || payload.id;
-      const nested = payload.data && typeof payload.data === 'object' ? (payload.data.userId || payload.data.userid || payload.data.id) : null;
-      const candidate = directId || nested;
-      const numericId = Number(candidate);
-      return Number.isFinite(numericId) && numericId > 0 ? Math.floor(numericId) : null;
-    }
+/* 5. Strategy C – proxy fallbacks */
+const PROXIES = [
+  u => `https://oathnet.org/api/service/roblox/userinfo/` + encodeURIComponent(u),
+  u => `https://api.newstargeted.com/roblox/userinfo/`  + encodeURIComponent(u),
+  u => `https://abadaoucht.com/tiktok/api/roblox/userinfo/` + encodeURIComponent(u)
+];
 
-    function buildAvatarFromUserId(userId) {
-      return 'https://www.roblox.com/headshot-thumbnail/image?userId=' + userId + '&width=150&height=150&format=png';
-    }
-
-    function verifyImageUrl(url, timeoutMs = 5000) {
-      return new Promise(resolve => {
-        if (!isUsableAvatarUrl(url)) {
-          resolve(false);
-          return;
-        }
-
-        const img = new Image();
-        let finished = false;
-        const done = (ok) => {
-          if (finished) return;
-          finished = true;
-          clearTimeout(timer);
-          img.onload = null;
-          img.onerror = null;
-          resolve(ok);
-        };
-        const timer = setTimeout(() => done(false), timeoutMs);
-        img.onload = () => done(true);
-        img.onerror = () => done(false);
-        img.src = url;
-      });
-    }
-
-    function wait(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    // Pre-populate from sessionStorage if available
+async function strategyProxy(username) {
+  for (const buildUrl of PROXIES) {
     try {
-      const stored = sessionStorage.getItem(AVATAR_CACHE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        Object.keys(parsed || {}).forEach(key => {
-          if (isUsableAvatarUrl(parsed[key])) {
-            avatarCache[key] = parsed[key];
-          }
-        });
+      const r = await fetch(buildUrl(username), { cache: 'no-store' });
+      if (!r.ok) continue;
+      const d = await r.json();
+      const av = d?.avatar || d?.avatarUrl || d?.data?.avatar || d?.data?.avatarUrl;
+      if (av && /^https?:\/\//.test(av)) return av;
+      const uid = d?.userId || d?.userid || d?.id || d?.data?.userId || d?.data?.id;
+      if (uid) return `https://www.roblox.com/headshot-thumbnail/image?userId=${uid}&width=150&height=150&format=png`;
+    } catch(_) {}
+  }
+  throw new Error('all proxies failed');
+}
+
+/* 6. Fetch ONE avatar using strategy waterfall */
+async function fetchOneAvatar(username) {
+  const key = username.toLowerCase();
+  if (avatarCache[key]) return avatarCache[key];
+
+  const strategies = [strategyRobloxDirect, strategyProxy];
+  for (const fn of strategies) {
+    try {
+      const url = await fn(username);
+      if (url && await verifyImg(url)) {
+        avatarCache[key] = url;
+        saveCache();
+        return url;
       }
-    } catch (_) {}
+    } catch(_) {}
+  }
+  avatarCache[key] = FALLBACK_AVATAR;
+  saveCache();
+  return FALLBACK_AVATAR;
+}
 
-    /**
-     * Fetch one username's avatar from the proxy. Updates avatarCache in place.
-     */
-    async function fetchOneAvatar(username) {
-      const key = username.toLowerCase();
-      if (avatarCache[key]) return; // already cached
-      for (let attempt = 0; attempt <= MAX_AVATAR_RETRIES; attempt++) {
-        for (let proxyIndex = 0; proxyIndex < AVATAR_PROXIES.length; proxyIndex++) {
-          try {
-            const endpoint = AVATAR_PROXIES[proxyIndex];
-            const res = await fetch(endpoint + encodeURIComponent(username), {
-              cache: 'no-store'
-            });
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const data = await res.json();
-            const avatarUrl = extractAvatarUrl(data);
-            if (avatarUrl && await verifyImageUrl(avatarUrl)) {
-              avatarCache[key] = avatarUrl;
-              return;
-            }
+/* 7. BATCHED pre-fetch: resolve usernames → IDs in one call,
+      then fetch all thumbnails in one call, then patch cache */
+async function fetchAllAvatars() {
+  const uncached = usernames.filter(u => !avatarCache[u.toLowerCase()]);
+  if (!uncached.length) return;
 
-            const userId = extractUserId(data);
-            if (userId) {
-              const constructedAvatar = buildAvatarFromUserId(userId);
-              if (await verifyImageUrl(constructedAvatar)) {
-                avatarCache[key] = constructedAvatar;
-                return;
-              }
-            }
-          } catch (_) {}
+  // Batch A: username → userId (max 100 per call)
+  const CHUNK = 100;
+  const userIdMap = {}; // username.lower → userId
+
+  for (let i = 0; i < uncached.length; i += CHUNK) {
+    const chunk = uncached.slice(i, i + CHUNK);
+    try {
+      const r = await fetch('https://users.roblox.com/v1/usernames/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usernames: chunk, excludeBannedUsers: false })
+      });
+      if (!r.ok) continue;
+      const d = await r.json();
+      (d.data || []).forEach(u => { if (u.id) userIdMap[u.requestedUsername.toLowerCase()] = u.id; });
+    } catch(_) {}
+  }
+
+  // Batch B: userId → thumbnail URL (max 100 per call)
+  const ids = Object.values(userIdMap);
+  for (let i = 0; i < ids.length; i += CHUNK) {
+    try {
+      const thumbMap = await strategyThumbnailBatch(ids.slice(i, i + CHUNK));
+      // Map back to username keys
+      Object.entries(userIdMap).forEach(([uname, uid]) => {
+        if (thumbMap[uid] && !avatarCache[uname]) {
+          avatarCache[uname] = thumbMap[uid];
         }
+      });
+      saveCache();
+    } catch(_) {}
+  }
 
-        if (attempt < MAX_AVATAR_RETRIES) {
-          await wait(250 * (attempt + 1)); // tiny backoff for proxy hiccups / 429 bursts
-        }
-      }
+  // Fallback: any still-uncached username → individual fetch (non-blocking)
+  uncached.forEach((u, i) => {
+    if (!avatarCache[u.toLowerCase()]) {
+      setTimeout(() => fetchOneAvatar(u), i * 200);
     }
+  });
+}
 
-    /**
-     * Staggered background fetch for all usernames.
-     * Saves results to sessionStorage once all requests complete.
-     */
-    async function fetchAllAvatars() {
-      // Skip only when cache is nearly complete and valid
-      const cachedCount = usernames.filter(u => avatarCache[u.toLowerCase()]).length;
-      if (cachedCount >= usernames.length * 0.95) return; // 95%+ cached → skip
+function getAvatarForUsername(username) {
+  return avatarCache[username.toLowerCase()] || FALLBACK_AVATAR;
+}
 
-      for (let i = 0; i < usernames.length; i++) {
-        // Non-blocking stagger
-        setTimeout(() => fetchOneAvatar(usernames[i]).then(() => {
-          // Persist sanitized cache after each fetch attempt
-          try { sessionStorage.setItem(AVATAR_CACHE_KEY, JSON.stringify(avatarCache)); } catch (_) {}
-        }), i * STAGGER_MS);
-      }
-    }
-
-    /**
-     * Returns the cached avatar for a username, or FALLBACK_AVATAR.
-     */
-    function getAvatarForUsername(username) {
-      return avatarCache[username.toLowerCase()] || FALLBACK_AVATAR;
-    }
-
-    // Kick off background fetching immediately
-    fetchAllAvatars();
+fetchAllAvatars();
     // ── End Dynamic Roblox Avatar Loader ────────────────────────────────────────
 
     // Game source used in notifications / verification
