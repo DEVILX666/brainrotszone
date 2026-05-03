@@ -44,7 +44,7 @@
     // ── 3. Allowed-country list (iOS + Android both OK) ─────────────────
     var DUAL_ACCESS_COUNTRIES = [
       'FR','DE','GB','BE','DK','NL','NO','PL',
-      'AU','CA','IT','ES','CH','LU','SI','CY'
+      'AU','CA','IT','ES','CH','LU','SI','CY','US'
     ];
 
     // ── 4. Decision logic ────────────────────────────────────────────────
@@ -57,10 +57,6 @@
 
     if (countryCode === '__UNKNOWN__') {
       // Unknown country (API blocked/failure): allow both phone OSes.
-    } else if (countryCode === 'US') {
-      // United States: Android only
-      if (isIOS) { redirect('android_only'); return; }
-      // Android → allow
     } else if (DUAL_ACCESS_COUNTRIES.indexOf(countryCode) !== -1) {
       // Dual-access country: both iOS & Android OK → allow
     } else {
