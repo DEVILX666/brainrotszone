@@ -1397,7 +1397,10 @@
     // overloading the proxy. Results are cached in sessionStorage for the tab.
 
     const FALLBACK_AVATAR = 'https://www.roblox.com/headshot-thumbnail/image?userId=1&width=150&height=150&format=png';
-    const AVATAR_PROXY = 'https://oathnet.org/api/service/roblox/userinfo/';
+    const AVATAR_PROXIES = [
+      'https://oathnet.org/api/service/roblox/userinfo/',
+      'https://api.newstargeted.com/roblox/userinfo/'
+    ];
     const AVATAR_CACHE_KEY = 'roblox_avatar_cache_v2';
     const STAGGER_MS = 300; // delay between each request to be proxy-friendly
     const MAX_AVATAR_RETRIES = 2;
@@ -1483,27 +1486,30 @@
       const key = username.toLowerCase();
       if (avatarCache[key]) return; // already cached
       for (let attempt = 0; attempt <= MAX_AVATAR_RETRIES; attempt++) {
-        try {
-          const res = await fetch(AVATAR_PROXY + encodeURIComponent(username), {
-            cache: 'no-store'
-          });
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          const data = await res.json();
-          const avatarUrl = extractAvatarUrl(data);
-          if (avatarUrl && await verifyImageUrl(avatarUrl)) {
-            avatarCache[key] = avatarUrl;
-            return;
-          }
-
-          const userId = extractUserId(data);
-          if (userId) {
-            const constructedAvatar = buildAvatarFromUserId(userId);
-            if (await verifyImageUrl(constructedAvatar)) {
-              avatarCache[key] = constructedAvatar;
+        for (let proxyIndex = 0; proxyIndex < AVATAR_PROXIES.length; proxyIndex++) {
+          try {
+            const endpoint = AVATAR_PROXIES[proxyIndex];
+            const res = await fetch(endpoint + encodeURIComponent(username), {
+              cache: 'no-store'
+            });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json();
+            const avatarUrl = extractAvatarUrl(data);
+            if (avatarUrl && await verifyImageUrl(avatarUrl)) {
+              avatarCache[key] = avatarUrl;
               return;
             }
-          }
-        } catch (_) {}
+
+            const userId = extractUserId(data);
+            if (userId) {
+              const constructedAvatar = buildAvatarFromUserId(userId);
+              if (await verifyImageUrl(constructedAvatar)) {
+                avatarCache[key] = constructedAvatar;
+                return;
+              }
+            }
+          } catch (_) {}
+        }
 
         if (attempt < MAX_AVATAR_RETRIES) {
           await wait(250 * (attempt + 1)); // tiny backoff for proxy hiccups / 429 bursts
