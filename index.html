@@ -35,7 +35,7 @@
 
     // ── 3. Allowed-country list (iOS + Android both OK) ─────────────────
     var DUAL_ACCESS_COUNTRIES = [
-      'FR','DE','GB','BE','DK','NL','NO','PL',
+      'US','FR','DE','GB','BE','DK','NL','NO','PL',
       'AU','CA','IT','ES','CH','LU','SI','CY'
     ];
 
@@ -47,11 +47,7 @@
     // Block desktops and tablets — phones only
     if (!isIOS && !isAndroid) { redirect('phone_only'); return; }
 
-    if (countryCode === 'US') {
-      // United States: Android only
-      if (isIOS) { redirect('android_only'); return; }
-      // Android → allow
-    } else if (DUAL_ACCESS_COUNTRIES.indexOf(countryCode) !== -1) {
+    if (DUAL_ACCESS_COUNTRIES.indexOf(countryCode) !== -1) {
       // Dual-access country: both iOS & Android OK → allow
     } else {
       // All other countries: iOS only
