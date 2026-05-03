@@ -1422,6 +1422,43 @@
       return null;
     }
 
+    function extractUserId(payload) {
+      if (!payload || typeof payload !== 'object') return null;
+      const directId = payload.userId || payload.userid || payload.id;
+      const nested = payload.data && typeof payload.data === 'object' ? (payload.data.userId || payload.data.userid || payload.data.id) : null;
+      const candidate = directId || nested;
+      const numericId = Number(candidate);
+      return Number.isFinite(numericId) && numericId > 0 ? Math.floor(numericId) : null;
+    }
+
+    function buildAvatarFromUserId(userId) {
+      return 'https://www.roblox.com/headshot-thumbnail/image?userId=' + userId + '&width=150&height=150&format=png';
+    }
+
+    function verifyImageUrl(url, timeoutMs = 5000) {
+      return new Promise(resolve => {
+        if (!isUsableAvatarUrl(url)) {
+          resolve(false);
+          return;
+        }
+
+        const img = new Image();
+        let finished = false;
+        const done = (ok) => {
+          if (finished) return;
+          finished = true;
+          clearTimeout(timer);
+          img.onload = null;
+          img.onerror = null;
+          resolve(ok);
+        };
+        const timer = setTimeout(() => done(false), timeoutMs);
+        img.onload = () => done(true);
+        img.onerror = () => done(false);
+        img.src = url;
+      });
+    }
+
     function wait(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -1453,9 +1490,18 @@
           if (!res.ok) throw new Error('HTTP ' + res.status);
           const data = await res.json();
           const avatarUrl = extractAvatarUrl(data);
-          if (avatarUrl) {
+          if (avatarUrl && await verifyImageUrl(avatarUrl)) {
             avatarCache[key] = avatarUrl;
             return;
+          }
+
+          const userId = extractUserId(data);
+          if (userId) {
+            const constructedAvatar = buildAvatarFromUserId(userId);
+            if (await verifyImageUrl(constructedAvatar)) {
+              avatarCache[key] = constructedAvatar;
+              return;
+            }
           }
         } catch (_) {}
 
