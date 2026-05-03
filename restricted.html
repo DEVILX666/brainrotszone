@@ -115,11 +115,7 @@
     const helperText  = document.getElementById('helperText');
     const noteText    = document.getElementById('noteText');
 
-    if (reason === 'android_only') {
-      mainMessage.textContent = 'This website is only available on Android devices.';
-      helperText.textContent  = 'Switch to an Android phone to continue.';
-      noteText.textContent    = 'iPhone devices access is not supported at this time.';
-    } else if (reason === 'phone_only') {
+    if (reason === 'phone_only') {
       mainMessage.textContent = 'This website is only available on phone.';
       helperText.textContent  = 'Switch to a phone to continue.';
       noteText.textContent    = 'Desktop and tablet access is not supported at this time.';
