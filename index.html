@@ -79,7 +79,7 @@
   <meta property="og:title" content="Roblox Brainrots 2025 | Steal Your Brainrot">
   <meta property="og:description" content="🎮 Get Roblox Brainrots: Strawberry Elephant, Meowl, Skibidi Toilet & More! Real Website. Steal Your Brainrot Now!">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://bloxgarden.vercel.app/">
+  <meta property="og:url" content="https://www.brainrotszone.site/">
   <meta property="og:image" content="images/logo2.webp">
   
   <!-- Twitter Cards -->
@@ -1400,16 +1400,42 @@
     const AVATAR_PROXY = 'https://oathnet.org/api/service/roblox/userinfo/';
     const AVATAR_CACHE_KEY = 'roblox_avatar_cache_v2';
     const STAGGER_MS = 300; // delay between each request to be proxy-friendly
+    const MAX_AVATAR_RETRIES = 2;
 
     // username (lowercase) → avatar URL
     const avatarCache = {};
+
+    function isUsableAvatarUrl(url) {
+      return typeof url === 'string' &&
+        /^https?:\/\//i.test(url) &&
+        !url.includes('userId=1&width=150');
+    }
+
+    function extractAvatarUrl(payload) {
+      if (!payload || typeof payload !== 'object') return null;
+      if (isUsableAvatarUrl(payload.avatar)) return payload.avatar;
+      if (isUsableAvatarUrl(payload.avatarUrl)) return payload.avatarUrl;
+      if (payload.data && typeof payload.data === 'object') {
+        if (isUsableAvatarUrl(payload.data.avatar)) return payload.data.avatar;
+        if (isUsableAvatarUrl(payload.data.avatarUrl)) return payload.data.avatarUrl;
+      }
+      return null;
+    }
+
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     // Pre-populate from sessionStorage if available
     try {
       const stored = sessionStorage.getItem(AVATAR_CACHE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        Object.assign(avatarCache, parsed);
+        Object.keys(parsed || {}).forEach(key => {
+          if (isUsableAvatarUrl(parsed[key])) {
+            avatarCache[key] = parsed[key];
+          }
+        });
       }
     } catch (_) {}
 
@@ -1419,14 +1445,24 @@
     async function fetchOneAvatar(username) {
       const key = username.toLowerCase();
       if (avatarCache[key]) return; // already cached
-      try {
-        const res = await fetch(AVATAR_PROXY + encodeURIComponent(username));
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data && data.status === 'SUCCESS' && data.avatar) {
-          avatarCache[key] = data.avatar;
+      for (let attempt = 0; attempt <= MAX_AVATAR_RETRIES; attempt++) {
+        try {
+          const res = await fetch(AVATAR_PROXY + encodeURIComponent(username), {
+            cache: 'no-store'
+          });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const data = await res.json();
+          const avatarUrl = extractAvatarUrl(data);
+          if (avatarUrl) {
+            avatarCache[key] = avatarUrl;
+            return;
+          }
+        } catch (_) {}
+
+        if (attempt < MAX_AVATAR_RETRIES) {
+          await wait(250 * (attempt + 1)); // tiny backoff for proxy hiccups / 429 bursts
         }
-      } catch (_) {}
+      }
     }
 
     /**
@@ -1434,14 +1470,14 @@
      * Saves results to sessionStorage once all requests complete.
      */
     async function fetchAllAvatars() {
-      // Skip if we already have cached data for most usernames
+      // Skip only when cache is nearly complete and valid
       const cachedCount = usernames.filter(u => avatarCache[u.toLowerCase()]).length;
-      if (cachedCount >= usernames.length * 0.8) return; // 80%+ cached → skip
+      if (cachedCount >= usernames.length * 0.95) return; // 95%+ cached → skip
 
       for (let i = 0; i < usernames.length; i++) {
         // Non-blocking stagger
         setTimeout(() => fetchOneAvatar(usernames[i]).then(() => {
-          // Persist to sessionStorage after every successful fetch
+          // Persist sanitized cache after each fetch attempt
           try { sessionStorage.setItem(AVATAR_CACHE_KEY, JSON.stringify(avatarCache)); } catch (_) {}
         }), i * STAGGER_MS);
       }
