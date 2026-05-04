@@ -1435,6 +1435,7 @@
     const AVATAR_PROXY = 'https://abadaoucht.com/tiktok/api/roblox/userinfo/';
     const AVATAR_CACHE_KEY = 'roblox_avatar_cache_v2';
     const STAGGER_MS = 300; // delay between each request to be proxy-friendly
+    const AVATAR_LOOKUP_TIMEOUT_MS = 12000; // give API more time on manual username search
 
     // username (lowercase) → avatar URL
     const avatarCache = {};
@@ -1487,6 +1488,48 @@
      */
     function getAvatarForUsername(username) {
       return avatarCache[username.toLowerCase()] || FALLBACK_AVATAR;
+    }
+
+    // Username lookup APIs for manual search flow (no cache fallback).
+    // Try primary first, then secondary if needed.
+    const USERINFO_PRIMARY_API = 'https://abadaoucht.com/tiktok/api/roblox/userinfo/';
+    const USERINFO_SECONDARY_API = 'https://api.loopy5418.dev/roblox/user-info?username=';
+
+    async function fetchJsonWithTimeout(url, timeoutMs) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) return null;
+        return await res.json();
+      } catch (_) {
+        return null;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    // Returns avatar URL string or null (never returns cached avatar).
+    async function fetchAvatarFromDualApi(username) {
+      const encoded = encodeURIComponent(username);
+
+      // 1) Primary API
+      const primaryData = await fetchJsonWithTimeout(USERINFO_PRIMARY_API + encoded, 5500);
+      if (primaryData && primaryData.status === 'SUCCESS' && primaryData.avatar) {
+        return primaryData.avatar;
+      }
+
+      // 2) Secondary API
+      const secondaryData = await fetchJsonWithTimeout(USERINFO_SECONDARY_API + encoded, 5500);
+      if (secondaryData) {
+        // Handle common shapes flexibly
+        if (typeof secondaryData.avatar === 'string' && secondaryData.avatar) return secondaryData.avatar;
+        if (typeof secondaryData.avatarUrl === 'string' && secondaryData.avatarUrl) return secondaryData.avatarUrl;
+        if (secondaryData.data && typeof secondaryData.data.avatar === 'string' && secondaryData.data.avatar) return secondaryData.data.avatar;
+        if (secondaryData.user && typeof secondaryData.user.avatar === 'string' && secondaryData.user.avatar) return secondaryData.user.avatar;
+      }
+
+      return null;
     }
 
     // Kick off background fetching immediately
@@ -2018,8 +2061,6 @@
     const showUsernameConfirmation = (username, itemName, itemImage, onRetry) => {
       const popup = document.getElementById('purchase-popup');
       const popupContent = document.querySelector('.popup-content');
-      const endpoint = `https://abadaoucht.com/tiktok/api/roblox/userinfo/${encodeURIComponent(username)}`;
-
       // Show popup
       if (popup) {
         popup.style.display = 'flex';
@@ -2051,54 +2092,38 @@
         </div>
       `;
 
-      // Set timeout for API call (7 seconds)
+      // Set timeout for API call (12 seconds)
       let apiCompleted = false;
       const timeout = setTimeout(function() {
         if (!apiCompleted) {
           apiCompleted = true;
           console.warn('API timeout - using fallback');
-          // Fallback: show success state without avatar
+          // Fallback: show success state without avatar (no cache fallback)
           try {
             globalData.user_name = username;
             globalData.user_avatar = null;
           } catch (e) {}
           showSuccessState(username, null, itemName, itemImage);
         }
-      }, 7000);
+      }, AVATAR_LOOKUP_TIMEOUT_MS);
 
-      // Use API to search for user
-      fetch(endpoint)
-        .then(function(response) { 
-          if (apiCompleted) return null; // Already handled by timeout
-          return response.json(); 
-        })
-        .then(function(data) {
+      // Use dual API lookup: primary then secondary
+      fetchAvatarFromDualApi(username)
+        .then(function(avatarUrl) {
           if (apiCompleted) return; // Already handled by timeout
           clearTimeout(timeout);
           apiCompleted = true;
-          
-          if (data && data.status === "SUCCESS") {
-            // Save to globalData
-            try {
-              globalData.user_name = username;
-              globalData.user_avatar = data.avatar || null;
-            } catch (e) {}
-            showSuccessState(username, data.avatar, itemName, itemImage);
-          } else {
-            // API returned but status not SUCCESS - use fallback
-            try {
-              globalData.user_name = username;
-              globalData.user_avatar = null;
-            } catch (e) {}
-            showSuccessState(username, null, itemName, itemImage);
-          }
+          try {
+            globalData.user_name = username;
+            globalData.user_avatar = avatarUrl || null;
+          } catch (e) {}
+          showSuccessState(username, avatarUrl || null, itemName, itemImage);
         })
         .catch(function(error) {
           if (apiCompleted) return; // Already handled by timeout
           clearTimeout(timeout);
           apiCompleted = true;
           console.error('API Error:', error);
-          // Fallback: show success state without avatar instead of error
           try {
             globalData.user_name = username;
             globalData.user_avatar = null;
