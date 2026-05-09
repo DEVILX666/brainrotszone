@@ -11,6 +11,12 @@
     // ── 1. Device detection ──────────────────────────
     var ua = navigator.userAgent || '';
     var isIOS     = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    // iPadOS 13+ can report as desktop Safari (Macintosh / touch Mac)
+    if (!isIOS && typeof navigator !== 'undefined') {
+      if (/Macintosh/.test(ua) && typeof navigator.maxTouchPoints === 'number' && navigator.maxTouchPoints > 1) {
+        isIOS = true;
+      }
+    }
     var isAndroid = /Android/.test(ua);
     // If neither iOS nor Android → treat as "not a phone" (desktop/tablet)
     // Policy says restrictions apply to iOS vs Android only; desktops have
@@ -48,6 +54,11 @@
     if (!isIOS && !isAndroid) { redirect('phone_only'); return; }
 
     var countryKnown = countryCode.length === 2;
+    // United States: Android-only (block iPhone, iPad, and other iOS)
+    if (isIOS && countryKnown && countryCode === 'US') {
+      redirect('android_only_us');
+      return;
+    }
     if (!countryKnown || DUAL_ACCESS_COUNTRIES.indexOf(countryCode) !== -1) {
       // Unknown country (API failed / empty): fail open — both platforms OK.
       // Dual-access list: both iOS & Android OK → allow
