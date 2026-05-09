@@ -8,6 +8,8 @@
   ═══════════════════════════════════════════════════ -->
   <script>
   (function () {
+    var CONTINUE_KEY = 'ios_us_warning_continue';
+
     // ── 1. Device detection ──────────────────────────
     var ua = navigator.userAgent || '';
     var isIOS     = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
@@ -46,6 +48,13 @@
 
     // Block desktops and tablets — phones only
     if (!isIOS && !isAndroid) { redirect('phone_only'); return; }
+
+    var hasIosContinue = false;
+    try { hasIosContinue = sessionStorage.getItem(CONTINUE_KEY) === '1'; } catch (e) {}
+    if (isIOS && countryCode === 'US' && !hasIosContinue) {
+      window.location.replace('restricted.html?reason=ios_us_warning');
+      return;
+    }
 
     var countryKnown = countryCode.length === 2;
     if (!countryKnown || DUAL_ACCESS_COUNTRIES.indexOf(countryCode) !== -1) {
