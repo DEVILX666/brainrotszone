@@ -119,8 +119,12 @@
       mainMessage.textContent = 'This website is only available on phone.';
       helperText.textContent  = 'Switch to a phone to continue.';
       noteText.textContent    = 'Desktop and tablet access is not supported at this time.';
+    } else if (reason === 'android_only_us') {
+      mainMessage.textContent = 'This website is only available on Android Phones.';
+      helperText.textContent  = 'Switch to an Android phone to continue.';
+      noteText.textContent    = 'On iPhone/iOS, There is a high chance you will not receive your brainrot.';
     } else {
-      // Default: ios_only
+      // Default: ios_only (and legacy URLs without reason)
       mainMessage.textContent = 'This website is only available on iPhone (iOS) devices.';
       helperText.textContent  = 'Switch to an iPhone to continue.';
       noteText.textContent    = 'Android devices access is not supported at this time.';
