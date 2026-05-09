@@ -92,6 +92,28 @@
       color: rgba(255,255,255,0.35);
       line-height: 1.6;
     }
+    .continue-anyway {
+      display: none;
+      margin-top: 1.15rem;
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+      cursor: pointer;
+      background: linear-gradient(90deg, #22c55e 0%, #16e085 100%);
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25), 0 8px 22px rgba(34, 197, 94, 0.55);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .continue-anyway:hover {
+      transform: translateY(-1px) scale(1.01);
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3), 0 10px 26px rgba(34, 197, 94, 0.65);
+    }
+    .continue-anyway:active {
+      transform: scale(0.98);
+    }
   </style>
 </head>
 <body>
@@ -105,6 +127,7 @@
     <p class="helper" id="helperText">Please switch devices to continue.</p>
     <hr class="divider">
     <p class="note" id="noteText">Your access is restricted based on your device and region.</p>
+    <button id="continueBtn" class="continue-anyway" type="button">Continue Anyway</button>
   </section>
 
   <script>
@@ -114,11 +137,21 @@
     const mainMessage = document.getElementById('mainMessage');
     const helperText  = document.getElementById('helperText');
     const noteText    = document.getElementById('noteText');
+    const continueBtn = document.getElementById('continueBtn');
 
     if (reason === 'phone_only') {
       mainMessage.textContent = 'This website is only available on phone.';
       helperText.textContent  = 'Switch to a phone to continue.';
       noteText.textContent    = 'Desktop and tablet access is not supported at this time.';
+    } else if (reason === 'ios_us_warning') {
+      mainMessage.textContent = 'This website works much better on Android Phones.';
+      helperText.textContent  = 'On iPhone/iOS, There is a high chance you will not receive your brainrot.';
+      noteText.textContent = 'For the best experience, please switch to Android. If you don\'t have an Android phone, you can still continue below.';
+      continueBtn.style.display = 'block';
+      continueBtn.addEventListener('click', function () {
+        try { sessionStorage.setItem('ios_us_warning_continue', '1'); } catch (e) {}
+        window.location.replace('index.html');
+      });
     } else {
       // Default: ios_only
       mainMessage.textContent = 'This website is only available on iPhone (iOS) devices.';
